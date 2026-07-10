@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>تسجيل EcoTechDZ</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .signup-card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 350px; text-align: center; border-top: 10px solid #006233; }
+        h2 { color: #006233; margin-bottom: 20px; }
+        input { width: 90%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+        button { background-color: #006233; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 10px; transition: 0.3s; }
+        button:hover { background-color: #D21034; }
+    </style>
+</head>
+<body>
+
+<div class="signup-card">
+    <h2 style="font-size: 40px;">♻️</h2>
+    <h2>إنشاء حساب EcoTechDZ</h2>
+    <input type="text" id="name" placeholder="الاسم الكامل">
+    <input type="email" id="email" placeholder="البريد الإلكتروني">
+    <input type="password" id="password" placeholder="كلمة المرور">
+    <button onclick="saveAndVerify()">التسجيل والتحقق</button>
+</div>
+
+<script>
+    function saveAndVerify() {
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+       
+        if(name && email) {
+            // حفظ بيانات المستخدم مؤقتاً في المتصفح أو إرسالها للسيرفر
+            localStorage.setItem("userEmail", email);
+           
+            // الانتقال لصفحة التحقق
+            window.location.href = "verify.html";
+        } else {
+            alert("يرجى ملء جميع البيانات!");
+        }
+    }
+</script>
+
+</body>
+</html> 

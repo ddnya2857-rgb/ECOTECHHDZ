@@ -1,0 +1,88 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f7f6; /* لون فاتح ومريح للعين */
+    margin: 0;
+    padding: 0;
+}
+
+.logo-container {
+    text-align: center;
+    padding: 20px;
+    background: white;
+    border-bottom: 5px solid #006233; /* خط أخضر في الأسفل */
+}
+
+/* تنسيق عام للجداول والأزرار */
+table {
+    width: 90%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background: white;
+}
+
+button {
+    background-color: #006233; /* الأخضر الوطني */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #D21034; /* يتغير للأحمر عند تمرير الفأرة */
+} 
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6;
+    padding: 20px;
+    text-align: center;
+}
+
+input {
+    padding: 10px;
+    width: 250px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover { background-color: #218838; }
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+li {
+    background: white;
+    margin: 5px auto;
+    padding: 10px;
+    width: 300px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+li button {
+    background-color: #dc3545;
+    padding: 5px 10px;
+} 
+select {
+    padding: 10px;
+    width: 250px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    margin-left: 10px; /* لترك مسافة بسيطة بينها وبين الزر */
+} 

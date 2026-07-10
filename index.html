@@ -1,0 +1,127 @@
+<div class="logo-container">
+    <div class="recycling-icon" style="color: #006233;">♻️</div> <!-- الأخضر -->
+    <h1 style="color: #006233;">Eco<span style="color: #D21034;">Tech</span>DZ</h1> <!-- الأحمر -->
+</div> 
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoTechDZ - سوق النفايات الذكي</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f9f9f9; }
+        nav { background-color: #333; padding: 15px; text-align: center; }
+        nav a { color: white; margin: 0 15px; text-decoration: none; font-weight: bold; font-size: 16px; }
+        nav a:hover { text-decoration: underline; }
+        .container { max-width: 800px; margin: 20px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1, h3 { color: #2c3e50; text-align: center; }
+        .camera-section { border: 2px solid #4CAF50; padding: 20px; margin-bottom: 20px; text-align: center; border-radius: 6px; background-color: #fafafa; }
+        .market-section { border: 1px solid #ccc; padding: 20px; border-radius: 6px; background-color: #fcfcfc; }
+        video { background: #eee; border-radius: 4px; margin-bottom: 10px; border: 1px solid #ddd; }
+        button { background-color: #4CAF50; color: white; border: none; padding: 10px 20px; font-size: 16px; cursor: pointer; border-radius: 4px; font-weight: bold; }
+        button:hover { background-color: #45a049; }
+        input, select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
+        label { font-weight: bold; color: #444; }
+    </style>
+</head>
+<body>
+
+    <!-- شريط التنقل الموحد لربط الصفحات الثلاث معاً بضغطة زر -->
+    <nav>
+        <a href="index.html">سوق النفايات (الرئيسية)</a>
+        <a href="signup.html">تسجيل مستخدم جديد</a>
+        <a href="dashboard.html">لوحة التحكم والتحليل المالي</a>
+    </nav>
+
+    <div class="container">
+        <h1>EcoTechDZ - منصة تدوير النفايات الذكية</h1>
+
+        <!-- قسم الكاميرا والذكاء الاصطناعي -->
+        <div class="camera-section">
+            <h3>التصنيف الذكي بالذكاء الاصطناعي</h3>
+            <video id="webcam" autoplay playsinline width="220" height="220"></video>
+            <br>
+            <button onclick="classifyWaste()">تصنيف النفايات بالكاميرا</button>
+            <h4 id="result-ai" style="color: #27ae60; margin-top: 15px;">النتيجة: بانتظار التصوير...</h4>
+        </div>
+
+        <!-- قسم السوق وإدخال البيانات للبيع والشراء -->
+        <div class="market-section">
+            <h3>إضافة بيانات مادة جديدة للسوق</h3>
+           
+            <label>نوع المادة النفطية/الصلبة (يظهر تلقائياً بعد التصنيف):</label>
+            <input type="text" id="wasteType" placeholder="نوع النفايات المنشورة">
+           
+            <label>طبيعة المعاملة المالية (نوع العملية):</label>
+            <select id="operationType">
+                <option value="بيع">بيع (عرض كميات متوفرة للبيع)</option>
+                <option value="شراء">شراء (طلب شراء كميات محددة لإعادة تدويرها)</option>
+            </select>
+
+            <label>السعر المقدر المقترح (دج):</label>
+            <input type="number" id="price" placeholder="أدخل السعر المقترح بالدينار الجزائري">
+
+            <label>مكان التواجد الفعلي / العنوان:</label>
+            <input type="text" id="userLocation" placeholder="العنوان أو الولاية">
+           
+            <button onclick="sendData()" style="width: 100%; background-color: #2c3e50; padding: 12px; font-size: 18px;">نشر المادة في السوق</button>
+        </div>
+    </div>
+
+    <script>
+        let model;
+        async function loadModel() {
+            try {
+                model = await mobilenet.load();
+                const video = document.getElementById('webcam');
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+            } catch (error) {
+                console.error("خطأ في تشغيل الكاميرا أو تحميل النموذج:", error);
+            }
+        }
+        loadModel();
+
+        async function classifyWaste() {
+            const video = document.getElementById('webcam');
+            if (!model) {
+                alert("النموذج البرمجي قيد التحميل، يرجى إعادة المحاولة خلال ثوانٍ...");
+                return;
+            }
+            const predictions = await model.classify(video);
+            const topResult = predictions[0].className;
+            document.getElementById('result-ai').textContent = 'النتيجة المكتشفة: ' + topResult;
+            document.getElementById('wasteType').value = topResult;
+        }
+
+        async function sendData() {
+            const data = {
+                name: document.getElementById('wasteType').value,
+                operation: document.getElementById('operationType').value,
+                price: document.getElementById('price').value,
+                location: document.getElementById('userLocation').value
+            };
+           
+            if(!data.name || !data.price || !data.location) {
+                alert("يرجى التأكد من ملء جميع الحقول والسعر والعنوان قبل النشر!");
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:5000/add-waste', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                alert(result.message);
+            } catch (error) {
+                alert("تعذر الاتصال بالسيرفر، تأكدي من تشغيل السيرفر أولاً عبر الأمر node server.js");
+            }
+        }
+    </script>
+</body>
+</html> 

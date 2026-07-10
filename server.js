@@ -1,22 +1,37 @@
 const express = require('express');
-const { Pool } = require('pg');
+const nodemailer = require('nodemailer');
+const bodyParser = require('body-parser');
 const app = express();
-app.use(express.json()); // هذا السطر يسمح للسيرفر بقراءة البيانات القادمة
 
-const pool = new Pool({
-  connectionString: 'postgresql://postgres.vofgmoasbbyfcnpbywex:EcoTechDZ2026@aws-0-eu-central-1.pooler.supabase.com:6543/postgres',
-  ssl: { rejectUnauthorized: false }
+app.use(bodyParser.json());
+
+// قومي بوضع بريدك وكلمة مرور التطبيق هنا فقط على جهازك
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'ddnya2857@gmail.com',
+        pass: 'اكتبي_كلمة_مرور_التطبيق_هنا'  
+    }
 });
 
-// مسار لإضافة نوع نفايات جديد
-app.post('/add-waste-type', async (req, res) => {
-  const { name } = req.body;
-  try {
-    const result = await pool.query('INSERT INTO waste_types (name) VALUES ($1) RETURNING *', [name]);
-    res.json({ message: '✅ تم إضافة نوع النفايات بنجاح!', data: result.rows[0] });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+app.post('/send-code', (req, res) => {
+    const { email } = req.body;
+    const code = Math.floor(100000 + Math.random() * 900000);
+
+    const mailOptions = {
+        from: 'EcoTechDZ <اكتبي_إيميلك_هنا@gmail.com>',
+        to: email,
+        subject: 'كود التحقق الخاص بـ EcoTechDZ',
+        text: `مرحباً بك في EcoTechDZ! كود التحقق الخاص بك هو: ${code}`
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.log(error);
+            return res.status(500).send("خطأ في إرسال الإيميل");
+        }
+        res.send({ status: "success" });
+    });
 });
 
-app.listen(5000, () => console.log('🚀 السيرفر يعمل على المنفذ 5000')); 
+app.listen(3000, () => console.log('السيرفر يعمل على المنفذ 3000')); 

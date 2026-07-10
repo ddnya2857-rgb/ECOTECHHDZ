@@ -1,0 +1,20 @@
+[
+  {
+    "name": "بلاستيك",
+    "operation": "بيع",
+    "price": "10",
+    "location": "بن عزوز"
+  },
+  {
+    "name": "ورق",
+    "operation": "بيع",
+    "price": "20",
+    "location": "الحروش"
+  },
+  {
+    "name": "زجاج",
+    "operation": "شراء",
+    "price": "20",
+    "location": "الحروش"
+  }
+]
