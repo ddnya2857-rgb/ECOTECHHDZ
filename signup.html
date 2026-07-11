@@ -2,38 +2,24 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>تسجيل حساب - EcoTechDZ</title>
+    <title>تسجيل في EcoTechDZ</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; }
-        .nav { background: #287456; padding: 15px; color: white; text-align: center; }
-        .nav a { color: white; margin: 0 10px; text-decoration: none; }
-        .container { max-width: 400px; margin: 50px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background: #287456; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; }
+        form { background: #fff; padding: 20px; border-radius: 8px; max-width: 400px; margin: auto; }
+        input, select, button { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; }
+        button { background-color: #28a745; color: white; border: none; cursor: pointer; }
     </style>
 </head>
-<link rel="stylesheet" href="style.css">
 <body>
 
-    <!-- شريط التنقل -->
-    <nav class="nav">
-        <a href="index.html">الرئيسية</a>
-        <a href="dashboard.html">لوحة التحكم</a>
-        <a href="signup.html">التسجيل</a>
-        <a href="verify.html">التحقق</a>
-    </nav>
-
-    <!-- نموذج التسجيل -->
-    <div class="container">
-        <h2>إنشاء حساب EcoTechDZ</h2>
-        <form id="signupForm">
+<form id="signupForm">
+    <h2>إنشاء حساب جديد</h2>
     <input type="text" id="fullName" placeholder="الاسم الكامل" required>
     <input type="email" id="email" placeholder="البريد الإلكتروني" required>
     <input type="password" id="password" placeholder="كلمة المرور" required>
    
-    <!-- إضافة قائمة نوع المستخدم هنا -->
     <label for="userType">نوع المستخدم:</label>
-    <select id="userType" required style="width: 100%; padding: 10px; margin: 10px 0;">
+    <select id="userType" required>
         <option value="individual">فرد</option>
         <option value="public_institution">مؤسسة عمومية</option>
         <option value="private_company">مؤسسة خاصة</option>
@@ -44,43 +30,53 @@
     </select>
    
     <button type="submit">التسجيل والتحقق</button>
-</form> 
+</form>
 
-    </div>
+<script>
+    // دالة الحصول على الموقع
+    function getUserLocation(callback) {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                callback({
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                });
+            }, (error) => {
+                alert("يرجى تفعيل الموقع لتسهيل عمليات النقل.");
+                callback(null);
+            });
+        } else {
+            alert("متصفحك لا يدعم نظام تحديد المواقع.");
+            callback(null);
+        }
+    }
 
-    <!-- كود إرسال البيانات -->
-    <script>
-        const userData = {
-    fullName: document.getElementById('fullName').value,
-    email: document.getElementById('email').value,
-    password: document.getElementById('password').value,
-    userType: document.getElementById('userType').value // أضفنا هذا السطر
-}; 
-        document.getElementById('signupForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+    // عملية التسجيل
+    document.getElementById('signupForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        getUserLocation((location) => {
             const userData = {
                 fullName: document.getElementById('fullName').value,
                 email: document.getElementById('email').value,
-                password: document.getElementById('password').value
+                password: document.getElementById('password').value,
+                userType: document.getElementById('userType').value,
+                location: location
             };
 
-            try {
-                const response = await fetch('/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(userData)
-                });
-                if (response.ok) {
-                    alert('تم التسجيل بنجاح! سيتم توجيهك لصفحة التحقق.');
-                    window.location.href = 'verify.html';
-                } else {
-                    alert('حدث خطأ في التسجيل.');
-                }
-            } catch (err) {
-                console.error('Error:', err);
-                alert('تأكدي من تشغيل السيرفر (server.js)');
-            }
+            fetch('/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData)
+            })
+            .then(res => res.text())
+            .then(data => {
+                alert("تم التسجيل بنجاح!");
+            })
+            .catch(err => console.error("خطأ:", err));
         });
-    </script>
+    });
+</script>
+
 </body>
 </html> 
