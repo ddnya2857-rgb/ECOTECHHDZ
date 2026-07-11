@@ -23,22 +23,30 @@
     </table>
 
     <script>
-        // جلب البيانات من السيرفر
-        fetch('/get-users')
-            .then(res => res.json())
-            .then(data => {
-                const tbody = document.getElementById('usersBody');
-                data.forEach(user => {
-                    const row = `<tr>
-                        <td>${user.fullName}</td>
-                        <td>${user.userType}</td>
-                        <td>${user.location ? user.location.lat.toFixed(4) + ', ' + user.location.lng.toFixed(4) : 'غير محدد'}</td>
-                        <td>0</td> <!-- لاحقاً سنربط هذا بحسابات النفايات -->
-                    </tr>`;
-                    tbody.innerHTML += row;
-                });
-            });
-    </script>
+    // جلب البيانات من السيرفر
+    fetch('/get-users')
+        .then(res => res.json())
+        .then(data => {
+            const tbody = document.getElementById('usersBody');
+            tbody.innerHTML = ''; // تفريغ الجدول قبل التعبئة
+
+            // هذه هي حلقة foreach التي تبحثين عنها
+           data.forEach(user => {
+    // التأكد من وجود إحداثيات الموقع
+    const locText = user.location ? `${user.location.lat.toFixed(4)}, ${user.location.lng.toFixed(4)}` : 'غير محدد';
+   
+    // بناء الصف (Row) داخل الجدول
+    const row = `<tr>
+        <td>${user.fullName}</td>
+        <td>${user.userType}</td>
+        <td>${locText}</td>
+        <td>${user.wasteQuantity || 0} كغ</td>
+    </tr>`;
+   
+    // إضافة الصف إلى جسم الجدول
+    tbody.innerHTML += row;
+});  
+</script> 
 </body>
 </html>
 

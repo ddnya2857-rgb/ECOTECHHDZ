@@ -13,6 +13,7 @@
 <body>
 
 <form id="signupForm">
+    <input type="number" id="wasteQuantity" placeholder="كمية النفايات (بالكيلوغرام)" required> 
     <h2>إنشاء حساب جديد</h2>
     <input type="text" id="fullName" placeholder="الاسم الكامل" required>
     <input type="email" id="email" placeholder="البريد الإلكتروني" required>
@@ -56,13 +57,14 @@
         e.preventDefault();
 
         getUserLocation((location) => {
-            const userData = {
-                fullName: document.getElementById('fullName').value,
-                email: document.getElementById('email').value,
-                password: document.getElementById('password').value,
-                userType: document.getElementById('userType').value,
-                location: location
-            };
+           const userData = {
+    fullName: document.getElementById('fullName').value,
+    email: document.getElementById('email').value,
+    password: document.getElementById('password').value,
+    userType: document.getElementById('userType').value,
+    wasteQuantity: document.getElementById('wasteQuantity').value, // إضافة الكمية
+    location: location
+};  
 
             fetch('/register', {
                 method: 'POST',
