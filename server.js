@@ -1,15 +1,39 @@
 const express = require('express');
+const path = require('path');
+const fs = require('fs');
 const app = express();
 
-// إعداد المنفذ ليعمل على Render بشكل صحيح
-const port = process.env.PORT || 3000;
+// إعداد لاستقبال بيانات JSON من النماذج
+app.use(express.json());
 
-// تعريف المسار الأساسي (الجذر)
+// تقديم ملفات المشروع (HTML, CSS, إلخ)
+app.use(express.static(__dirname));
+
+// الصفحة الرئيسية
 app.get('/', (req, res) => {
-  res.send('تم تشغيل موقع EcoTechDZ بنجاح!');
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// إعداد السيرفر للاستماع
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+// مسار تسجيل المستخدم وحفظ البيانات في users.json
+app.post('/register', (req, res) => {
+    const newUser = req.body;
+   
+    // قراءة الملف الحالي أو إنشاء مصفوفة جديدة إذا لم يوجد
+    let users = [];
+    if (fs.existsSync('users.json')) {
+        const data = fs.readFileSync('users.json');
+        users = JSON.parse(data);
+    }
+   
+    users.push(newUser);
+   
+    // حفظ البيانات في الملف
+    fs.writeFileSync('users.json', JSON.stringify(users, null, 2));
+    res.status(200).send('تم التسجيل بنجاح');
+});
+
+// إعداد المنفذ للعمل محلياً أو على Render
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 }); 

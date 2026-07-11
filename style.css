@@ -86,3 +86,42 @@ select {
     border-radius: 5px;
     margin-left: 10px; /* لترك مسافة بسيطة بينها وبين الزر */
 } 
+/* تنسيق عام للمشروع */
+:root {
+    --primary-color: #287456; /* الأخضر الأساسي للهوية */
+    --accent-color: #f4f4f4;  /* اللون الرمادي الفاتح للخلفية */
+    --text-color: #333;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--accent-color);
+    margin: 0;
+    color: var(--text-color);
+}
+
+/* شريط التنقل الموحد */
+nav {
+    background: var(--primary-color);
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+nav a {
+    color: white;
+    margin: 0 15px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* تنسيق الحاويات (Containers) لتبدو كبطاقات مالية */
+.container {
+    max-width: 800px;
+    margin: 30px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    border-top: 5px solid var(--primary-color);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+} 
