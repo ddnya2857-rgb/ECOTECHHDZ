@@ -27,15 +27,35 @@
     <div class="container">
         <h2>إنشاء حساب EcoTechDZ</h2>
         <form id="signupForm">
-            <input type="text" id="fullName" placeholder="الاسم الكامل" required>
-            <input type="email" id="email" placeholder="البريد الإلكتروني" required>
-            <input type="password" id="password" placeholder="كلمة المرور" required>
-            <button type="submit">التسجيل والتحقق</button>
-        </form>
+    <input type="text" id="fullName" placeholder="الاسم الكامل" required>
+    <input type="email" id="email" placeholder="البريد الإلكتروني" required>
+    <input type="password" id="password" placeholder="كلمة المرور" required>
+   
+    <!-- إضافة قائمة نوع المستخدم هنا -->
+    <label for="userType">نوع المستخدم:</label>
+    <select id="userType" required style="width: 100%; padding: 10px; margin: 10px 0;">
+        <option value="individual">فرد</option>
+        <option value="public_institution">مؤسسة عمومية</option>
+        <option value="private_company">مؤسسة خاصة</option>
+        <option value="recycling_center">مركز إعادة تدوير</option>
+        <option value="workshop">ورشة صناعية</option>
+        <option value="transport_truck">شاحنة نقل</option>
+        <option value="waste_collector">جامع نفايات</option>
+    </select>
+   
+    <button type="submit">التسجيل والتحقق</button>
+</form> 
+
     </div>
 
     <!-- كود إرسال البيانات -->
     <script>
+        const userData = {
+    fullName: document.getElementById('fullName').value,
+    email: document.getElementById('email').value,
+    password: document.getElementById('password').value,
+    userType: document.getElementById('userType').value // أضفنا هذا السطر
+}; 
         document.getElementById('signupForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const userData = {
