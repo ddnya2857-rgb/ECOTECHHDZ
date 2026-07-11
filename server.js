@@ -17,7 +17,7 @@ app.get('/', (req, res) => {
 // مسار تسجيل المستخدم وحفظ البيانات في users.json
 app.post('/register', (req, res) => {
     const newUser = req.body;
-   
+  
     // قراءة الملف الحالي أو إنشاء مصفوفة جديدة إذا لم يوجد
     let users = [];
     if (fs.existsSync('users.json')) {
@@ -30,7 +30,13 @@ app.post('/register', (req, res) => {
     // حفظ البيانات في الملف
     fs.writeFileSync('users.json', JSON.stringify(users, null, 2));
     res.status(200).send('تم التسجيل بنجاح');
+});// أضيفي هذا المسار في ملف server.js ليتمكن المتصفح من قراءة البيانات
+app.get('/get-users', (req, res) => {
+    const fs = require('fs');
+    const users = JSON.parse(fs.readFileSync('users.json', 'utf8'));
+    res.json(users);
 });
+
 
 // إعداد المنفذ للعمل محلياً أو على Render
 const PORT = process.env.PORT || 3000;
