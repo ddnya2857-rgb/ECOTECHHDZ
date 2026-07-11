@@ -123,5 +123,33 @@
             }
         }
     </script>
+  document.getElementById('paymentMethod').addEventListener('change', function() {
+        const infoDiv = document.getElementById('additionalInfo');
+        if (this.value === 'baridimob') {
+            infoDiv.innerHTML = '<input type="text" placeholder="أدخل رقم عملية بريدي موب" style="width: 100%; padding: 10px;">';
+        } else if (this.value === 'gold_card') {
+            infoDiv.innerHTML = '<p>سيتم توجيهك لصفحة الدفع الآمن...</p>';
+        } else {
+            infoDiv.innerHTML = '';
+        }
+    });
+</script>   
 </body>
 </html> 
+<div class="payment-container" style="max-width: 400px; margin: 20px auto; padding: 20px; border: 1px solid #ccc; border-radius: 10px;">
+    <h3>اختيار وسيلة الدفع</h3>
+    <form id="paymentForm">
+        <label>اختر وسيلة الدفع:</label>
+        <select id="paymentMethod" style="width: 100%; padding: 10px; margin-top: 10px;">
+            <option value="cash">الدفع عند الاستلام</option>
+            <option value="gold_card">البطاقة الذهبية</option>
+            <option value="baridimob">تحويل بريدي موب</option>
+        </select>
+       
+        <div id="additionalInfo" style="margin-top: 15px;">
+            <!-- هنا ستظهر خانات إضافية بناءً على اختيار المستخدم -->
+        </div>
+       
+        <button type="submit" style="width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; margin-top: 15px; cursor: pointer;">إتمام العملية</button>
+    </form>
+</div> 
