@@ -61,28 +61,43 @@
         const model = await mobilenet.load();
         const preds = await model.classify(video);
         const type = preds[0].className;
-        document.getElementById('result').innerText = "تم التصنيف كـ: " + type;
+       
+        // عرض نوع النفايات في الخانة
         document.getElementById('wasteType').value = type;
+        document.getElementById('result').innerText = "تم التصنيف كـ: " + type;
+
+        // تقدير وزن تلقائي بناءً على النوع (خوارزمية تقديرية)
+        let weight = 0;
+        if (type.includes('plastic') || type.includes('bottle')) weight = 0.5;
+        else if (type.includes('paper')) weight = 0.2;
+        else if (type.includes('metal')) weight = 1.5;
+        else weight = 1.0;
+
+        // إظهار الوزن التقديري في الخانة تلقائياً
+        document.getElementById('weight').value = weight;
+       
+        // حساب السعر بناءً على الوزن الجديد
         calculatePrice();
     }
 
     function calculatePrice() {
         const weight = document.getElementById('weight').value;
         const type = document.getElementById('wasteType').value.toLowerCase();
-        let price = 20; 
-        if (type.includes('plastic') || type.includes('bottle')) price = 30;
-        else if (type.includes('paper')) price = 10;
-        else if (type.includes('metal')) price = 120;
-        
-        const total = weight * price;
+       
+        // جدول الأسعار المعتمد
+        let pricePerKg = 20;
+        if (type.includes('plastic') || type.includes('bottle')) pricePerKg = 30;
+        else if (type.includes('paper')) pricePerKg = 10;
+        else if (type.includes('metal')) pricePerKg = 120;
+       
+        const total = (weight * pricePerKg).toFixed(2);
         document.getElementById('totalPrice').innerText = "السعر المتوقع: " + total + " دج";
     }
 
-    function saveData() { 
-        const op = document.getElementById('opType').value;
-        alert("تم نشر طلب " + (op === 'sell' ? 'البيع' : 'الشراء') + " بنجاح في سوق سكيكدة!"); 
+    function saveData() {
+        alert("تم نشر الطلب في سوق سكيكدة بنجاح!");
     }
-</script>
+</script> 
 
 </body>
 </html>
