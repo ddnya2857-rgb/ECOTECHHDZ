@@ -1,32 +1,70 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-<head><meta charset="UTF-8"><title>التسجيل - EcoTechDZ</title></head>
+<head>
+    <meta charset="UTF-8">
+    <title>EcoTechDZ - التسجيل</title>
+    <!-- مكتبة EmailJS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function(){ emailjs.init("DrsQFDKtRE2nbijaO"); })();
+    </script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; margin: 0; }
+        .nav-bar { background: #287456; padding: 15px; color: white; text-align: center; margin-bottom: 20px; }
+        .nav-bar a { color: white; margin: 0 10px; text-decoration: none; font-size: 16px; }
+        form { background: white; padding: 20px; border-radius: 10px; max-width: 400px; margin: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    </style>
+</head>
 <body>
-<nav style="background: #287456; padding: 15px; color: white; text-align: center; margin-bottom: 20px;">
-    <a href="signup.html" style="color: white; margin: 0 10px; text-decoration: none;">التسجيل</a>
-    <a href="verify.html" style="color: white; margin: 0 10px; text-decoration: none;">التحقق</a>
-    <a href="index.html" style="color: white; margin: 0 10px; text-decoration: none;">الرئيسية</a>
-    <a href="dashboard.html" style="color: white; margin: 0 10px; text-decoration: none;">لوحة التحكم</a>
-    <a id="admin-link" href="admin_dashboard.html" style="color: #ffcccc; margin: 0 10px; text-decoration: none; font-weight: bold; display: none;">قائمة المستخدمين</a>
-</nav>
-<form id="signupForm" style="max-width: 400px; margin: auto;">
-    <h2>إنشاء حساب جديد</h2>
-    <input type="text" id="fullName" placeholder="الاسم الكامل" required style="width: 100%; margin: 5px 0;">
-    <select id="userType" style="width: 100%; margin: 5px 0;">
-        <option value="individual">فرد</option>
-        <option value="public_org">مؤسسة عمومية</option>
-        <option value="private_org">مؤسسة خاصة</option>
-        <option value="workshop">ورشة صناعية</option>
-        <option value="transporter">شاحنة ناقل</option>
-        <option value="collector">جامع نفايات</option>
-    </select>
-    <input type="email" id="email" placeholder="البريد الإلكتروني" required style="width: 100%; margin: 5px 0;">
-    <button type="button" onclick="sendOTP()">إرسال كود التحقق</button>
-</form>
-<script>
-    if(localStorage.getItem("userEmail") === "ddnya2857@gmail.com") document.getElementById("admin-link").style.display = "inline";
-    function sendOTP() { alert("تم إرسال الكود إلى " + document.getElementById('email').value); window.location.href="verify.html"; }
-</script>
-</body>
-</html>
 
+    <!-- شريط التنقل للربط التسلسلي -->
+    <nav class="nav-bar">
+        <a href="signup.html">التسجيل</a>
+        <a href="verify.html">التحقق</a>
+        <a href="index.html">الرئيسية</a>
+        <a href="dashboard.html">لوحة التحكم</a>
+        <a id="admin-link" href="admin_dashboard.html" style="color: #ffcccc; font-weight: bold; display: none;">قائمة المستخدمين</a>
+    </nav>
+
+    <form id="signupForm">
+        <h2>إنشاء حساب جديد</h2>
+        <input type="text" id="fullName" placeholder="الاسم الكامل" required style="width: 100%; padding: 10px; margin: 5px 0;">
+        <select id="userType" style="width: 100%; padding: 10px; margin: 5px 0;">
+            <option value="individual">فرد</option>
+            <option value="public_org">مؤسسة عمومية</option>
+            <option value="private_org">مؤسسة خاصة</option>
+            <option value="workshop">ورشة صناعية</option>
+            <option value="transporter">شاحنة ناقل</option>
+            <option value="collector">جامع نفايات</option>
+        </select>
+        <input type="email" id="email" placeholder="البريد الإلكتروني" required style="width: 100%; padding: 10px; margin: 5px 0;">
+        <button type="button" onclick="sendOTP()" style="width: 100%; padding: 12px; background: #287456; color: white; border: none; cursor: pointer; border-radius: 5px;">إرسال كود التحقق</button>
+    </form>
+
+    <script>
+        // إظهار رابط الإدارة
+        if(localStorage.getItem("userEmail") === 'ddnya2857@gmail.com') {
+            document.getElementById("admin-link").style.display = "inline";
+        }
+
+        function sendOTP() {
+            const email = document.getElementById('email').value;
+            const code = Math.floor(100000 + Math.random() * 900000).toString();
+            const validTime = new Date(Date.now() + 15 * 60000).toLocaleTimeString();
+
+            emailjs.send("service_me5o2lp", "template_f2zzbb6", {
+                to_email: email,
+                passcode: code,
+                time: validTime
+            }).then(function() {
+                localStorage.setItem("myGeneratedOTP", code);
+                localStorage.setItem("userEmail", email);
+                alert("تم إرسال كود التحقق إلى بريدك بنجاح!");
+                window.location.href = "verify.html";
+            }, function(error) {
+                alert("حدث خطأ في الإرسال. تأكدي من الاتصال بالإنترنت.");
+            });
+        }
+    </script>
+</body>
+</html> 
