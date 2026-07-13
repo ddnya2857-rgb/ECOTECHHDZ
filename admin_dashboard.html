@@ -2,49 +2,24 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>لوحة إدارة EcoTechDZ</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f8f9fa; }
-        .container { background: #fff; padding: 20px; border-radius: 8px; max-width: 600px; margin: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        h2 { color: #333; }
-        ul { list-style: none; padding: 0; }
-        li { padding: 10px; border-bottom: 1px solid #eee; }
-    </style>
+    <title>إدارة النظام - EcoTechDZ</title>
 </head>
 <body>
-
-<div class="container">
-    <h2>لوحة إدارة النظام</h2>
-    <p>أهلاً بكِ يا مديرة، هذه قائمة المستخدمين المسجلين:</p>
-    <ul id="userList">تحميل البيانات...</ul>
-    <button onclick="window.location.href='index.html'">العودة للرئيسية</button>
-</div>
-
-<script>
-    // 1. كود الحماية (يمنع دخول غير المديرين)
-    const userRole = localStorage.getItem("userRole");
-    if (userRole !== "admin") {
-        alert("عذراً، هذه الصفحة مخصصة للمدير فقط!");
-        window.location.href = "index.html";
-    }
-
-    // 2. كود جلب وعرض البيانات من ملف users.json
-    fetch('/get-users')
-        .then(response => response.json())
-        .then(data => {
-            const list = document.getElementById('userList');
-            list.innerHTML = ""; // مسح كلمة "تحميل البيانات"
-            data.forEach(user => {
-                const li = document.createElement('li');
-                li.innerHTML = `<strong>${user.fullName}</strong> - البريد: ${user.email}`;
-                list.appendChild(li);
-            });
-        })
-        .catch(error => {
-            document.getElementById('userList').innerHTML = "لا توجد بيانات أو خطأ في الاتصال بالملف.";
-            console.error('خطأ:', error);
-        });
-</script>
-
+    <nav style="background: #287456; padding: 15px; color: white; text-align: center; margin-bottom: 20px;">
+        <a href="signup.html" style="color: white; margin: 0 10px; text-decoration: none;">التسجيل</a>
+        <a href="verify.html" style="color: white; margin: 0 10px; text-decoration: none;">التحقق</a>
+        <a href="index.html" style="color: white; margin: 0 10px; text-decoration: none;">الرئيسية</a>
+        <a href="dashboard.html" style="color: white; margin: 0 10px; text-decoration: none;">لوحة التحكم</a>
+        <a id="admin-link" href="admin_dashboard.html" style="color: #ffcccc; margin: 0 10px; text-decoration: none; font-weight: bold; display: none;">قائمة المستخدمين</a>
+    </nav>
+    <script>
+        if(localStorage.getItem("userEmail") === "ddnya2857@gmail.com") { document.getElementById("admin-link").style.display = "inline"; }
+    </script>
+   
+    <div class="container">
+        <h2>لوحة إدارة النظام</h2>
+        <ul id="userList">تحميل البيانات...</ul>
+    </div>
+    <!-- (ضعي هنا السكريبت الخاص بجلب المستخدمين) -->
 </body>
 </html> 

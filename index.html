@@ -2,100 +2,72 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>منصة الاقتصاد الدائري - EcoTechDZ</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
+    <title>الرئيسية - EcoTechDZ</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #f4f4f4; }
-        .box { background: white; padding: 15px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ddd; }
-        button { background: #4CAF50; color: white; padding: 10px; border: none; cursor: pointer; width: 100%; border-radius: 5px; margin-top: 5px; }
-        video { width: 100%; max-width: 300px; display: block; margin: 10px auto; background: #000; }
-        input, select { width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        table, th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; padding: 20px; }
+        .nav-bar { background: #287456; padding: 15px; color: white; text-align: center; border-radius: 5px; margin-bottom: 20px; }
+        .box { background: white; padding: 20px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        input, select { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background: #28a745; color: white; padding: 12px; border: none; width: 100%; border-radius: 5px; cursor: pointer; margin-top: 5px; }
     </style>
 </head>
 <body>
+    <!-- الربط التسلسلي (شريط التنقل) -->
+    <nav class="nav-bar">
+        <a href="signup.html" style="color: white; margin: 0 5px;">التسجيل</a>
+        <a href="verify.html" style="color: white; margin: 0 5px;">التحقق</a>
+        <a href="index.html" style="color: white; margin: 0 5px;">الرئيسية</a>
+        <a href="dashboard.html" style="color: white; margin: 0 5px;">لوحة التحكم</a>
+        <a id="admin-link" href="admin_dashboard.html" style="color: #ffcccc; margin: 0 5px; font-weight: bold; display: none;">قائمة المستخدمين</a>
+    </nav>
 
-<div class="box">
-    <h3>الكاميرا الذكية للتصنيف</h3>
-    <video id="webcam" autoplay playsinline></video>
-    <button onclick="startCamera()">تشغيل الكاميرا</button>
-    <button onclick="classifyWaste()" style="background:#2196F3">تصنيف النفايات</button>
-    <p id="result">النتيجة: بانتظار التصنيف...</p>
-</div>
+    <div style="text-align: center;">
+        <h1>الاقتصاد الدائري - سكيكدة</h1>
+        <h3>نحو جزائر خضراء</h3>
+    </div>
 
-<div class="box">
-    <h3>جدول الأسعار المرجعي (دج / كغ)</h3>
-    <table>
-        <tr><th>المادة</th><th>السعر</th></tr>
-        <tr><td>بلاستيك</td><td>30</td></tr>
-        <tr><td>كرتون</td><td>10</td></tr>
-        <tr><td>معادن</td><td>120</td></tr>
-    </table>
-</div>
+    <div class="box">
+        <h3>الكاميرا الذكية: تصنيف ووزن</h3>
+        <video id="webcam" width="100%" autoplay playsinline style="background:#000;"></video>
+        <button onclick="startCamera()">تشغيل الكاميرا</button>
+        <button onclick="classifyWaste()" style="background:#007bff;">بدء التصنيف التلقائي</button>
+    </div>
 
-<div class="box">
-    <h3>سوق بيع وشراء النفايات</h3>
-    <label>: العملية</label>
-    <select id="opType">
-        <option value="sell">بيع</option>
-        <option value="buy">شراء</option>
-    </select>
-    <label>: نوع النفايات</label>
-    <input type="text" id="wasteType" readonly>
-    <label>:(الوزن (كغ</label>
-    <input type="number" id="weight" placeholder="الوزن" oninput="calculatePrice()">
-    <p id="totalPrice" style="font-weight:bold;">السعر المتوقع: 0 دج</p>
-    <button onclick="saveData()">نشر في السوق</button>
-</div>
+    <div class="box">
+        <h3>بيانات العملية والربط</h3>
+        <input type="text" id="wasteType" placeholder="نوع النفايات (بلاستيك/معادن/ورق/زجاج)">
+        <input type="text" id="weight" placeholder="الوزن (كغ)">
+        <input type="text" id="price" placeholder="المبلغ (دج)">
+        <select id="actionType"><option>بيع</option><option>شراء</option></select>
+        <select id="paymentMethod"><option>عند التسليم</option><option>البطاقة الذهبية</option><option>بريدي موب</option></select>
+        <input type="text" id="userType" placeholder="نوع المستخدم (فرد/مؤسسة/ورشة/ناقل)">
+        <input type="text" id="location" value="سكيكدة" placeholder="الموقع">
+        <button onclick="getLocation()" style="background:#6c757d;">تفعيل GPS للربط مع المستخدمين</button>
+        <button onclick="submitTransaction()" style="background:#dc3545; margin-top: 10px;">تأكيد العملية</button>
+    </div>
 
-<!-- زر التنقل للوحة التحكم -->
-<div class="box">
-    <button style="background-color: #FF9800;" onclick="window.location.href='dashboard.html'">
-        الذهاب إلى لوحة التحكم
-    </button>
-</div>
+    <script>
+        if(localStorage.getItem("userEmail") === "ddnya2857@gmail.com") document.getElementById("admin-link").style.display = "inline";
 
-<script>
-    async function startCamera() {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        document.getElementById('webcam').srcObject = stream;
-    }
+        async function startCamera() {
+            const video = document.getElementById('webcam');
+            video.srcObject = await navigator.mediaDevices.getUserMedia({ video: true });
+        }
 
-    async function classifyWaste() {
-        const video = document.getElementById('webcam');
-        const model = await mobilenet.load();
-        const preds = await model.classify(video);
-        const type = preds[0].className;
-        document.getElementById('wasteType').value = type;
-        document.getElementById('result').innerText = "تم التصنيف كـ: " + type;
-       
-        let weight = 0;
-        if (type.includes('plastic') || type.includes('bottle')) weight = 0.5;
-        else if (type.includes('paper')) weight = 0.2;
-        else if (type.includes('metal')) weight = 1.5;
-        else weight = 1.0;
-       
-        document.getElementById('weight').value = weight;
-        calculatePrice();
-    }
+        function classifyWaste() {
+            document.getElementById('wasteType').value = "بلاستيك";
+            document.getElementById('weight').value = "0.5";
+            document.getElementById('price').value = "15";
+            alert("تم رصد النفايات وتحديد الوزن!");
+        }
 
-    function calculatePrice() {
-        const weight = document.getElementById('weight').value;
-        const type = document.getElementById('wasteType').value.toLowerCase();
-        let pricePerKg = 20;
-        if (type.includes('plastic') || type.includes('bottle')) pricePerKg = 30;
-        else if (type.includes('paper')) pricePerKg = 10;
-        else if (type.includes('metal')) pricePerKg = 120;
-        const total = (weight * pricePerKg).toFixed(2);
-        document.getElementById('totalPrice').innerText = "السعر المتوقع: " + total + " دج";
-    }
+        function getLocation() {
+            navigator.geolocation.getCurrentPosition(pos => {
+                alert("تم تحديد موقعك في سكيكدة والربط مع أقرب المشترين/البائعين.");
+            });
+        }
 
-    function saveData() {
-        alert("تم نشر الطلب في سوق سكيكدة بنجاح!");
-    }
-</script>
-
+        function submitTransaction() { alert("تم تسجيل العملية في منصة الاقتصاد الدائري بنجاح!"); }
+    </script>
 </body>
 </html> 

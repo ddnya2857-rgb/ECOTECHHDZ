@@ -2,41 +2,42 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>التحقق من الحساب - EcoTechDZ</title>
+    <title>التحقق - EcoTechDZ</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 50px; background-color: #f4f4f4; text-align: center; }
-        .container { background: #fff; padding: 30px; border-radius: 10px; max-width: 400px; margin: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
-        button:hover { background-color: #218838; }
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; }
+        .container { background: #fff; padding: 20px; border-radius: 8px; max-width: 400px; margin: auto; }
+        input, button { width: 100%; padding: 10px; margin: 10px 0; }
     </style>
 </head>
 <body>
+    <!-- شريط التنقل الموحد -->
+    <nav style="background: #287456; padding: 15px; color: white; text-align: center; margin-bottom: 20px;">
+        <a href="signup.html" style="color: white; margin: 0 10px; text-decoration: none;">التسجيل</a>
+        <a href="verify.html" style="color: white; margin: 0 10px; text-decoration: none;">التحقق</a>
+        <a href="index.html" style="color: white; margin: 0 10px; text-decoration: none;">الرئيسية</a>
+        <a href="dashboard.html" style="color: white; margin: 0 10px; text-decoration: none;">لوحة التحكم</a>
+        <a id="admin-link" href="admin_dashboard.html" style="color: #ffcccc; margin: 0 10px; text-decoration: none; font-weight: bold; display: none;">قائمة المستخدمين</a>
+    </nav>
+    <script>
+        if(localStorage.getItem("userEmail") === "ddnya2857@gmail.com") { document.getElementById("admin-link").style.display = "inline"; }
+    </script>
 
-<div class="container">
-    <h2>التحقق من البريد الإلكتروني</h2>
-    <p>لقد أرسلنا كود التحقق إلى بريدك، يرجى إدخاله أدناه:</p>
-    <input type="text" id="otpCode" placeholder="أدخل الكود المكون من 6 أرقام" required>
-    <button onclick="verifyAndRegister()">تأكيد التسجيل</button>
-</div>
+    <div class="container">
+        <h2>أدخل كود التحقق</h2>
+        <input type="text" id="otpInput" placeholder="أدخل الكود المكون من 6 أرقام">
+        <button onclick="verifyCode()">تأكيد</button>
+    </div>
 
-<script>
-    function verifyAndRegister() {
-        // استرجاع الكود الذي خزنّاه سابقاً من صفحة التسجيل
-        const savedOTP = localStorage.getItem("myGeneratedOTP");
-        const userOTP = document.getElementById('otpCode').value;
-
-        if (userOTP === savedOTP) {
-            alert("تم التحقق بنجاح! مرحباً بك في EcoTechDZ.");
-            // مسح الكود من الذاكرة للأمان
-            localStorage.removeItem("myGeneratedOTP");
-            // الانتقال التلقائي إلى لوحة التحكم
-            window.location.href = "index.html";
-        } else {
-            alert("عذراً، الكود غير صحيح. يرجى التأكد من الكود المرسل للإيميل.");
+    <script>
+        function verifyCode() {
+            const enteredOTP = document.getElementById('otpInput').value;
+            const savedOTP = localStorage.getItem("myGeneratedOTP");
+            if(enteredOTP === savedOTP) {
+                alert("تم التحقق بنجاح!");
+                localStorage.setItem("userEmail", "ddnya2857@gmail.com");
+                window.location.href = "index.html";
+            } else { alert("الكود غير صحيح"); }
         }
-    }
-</script>
-
+    </script>
 </body>
 </html> 
