@@ -42,4 +42,45 @@ app.get('/get-users', (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
+});
+const nodemailer = require('nodemailer');
+
+// إعداد خدمة البريد (سأستخدم Gmail كمثال)
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'your-email@gmail.com', // ضعي هنا إيميلك الخاص بالمشروع
+        pass: 'your-app-password'     // ضعي هنا "App Password" من إعدادات حسابك في Google
+    }
+});
+
+let otpStorage = {}; // لتخزين الكود المؤقت
+
+// مسار لإرسال الإيميل
+app.post('/send-otp', (req, res) => {
+    const { email } = req.body;
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    otpStorage[email] = otp;
+
+    transporter.sendMail({
+        from: 'EcoTechDZ <your-email@gmail.com>',
+        to: email,
+        subject: 'كود التحقق الخاص بك',
+        text: `كود التحقق الخاص بك هو: ${otp}`
+    }, (error, info) => {
+        if (error) return res.status(500).json({ message: "خطأ في الإرسال" });
+        res.json({ success: true });
+    });
+});
+
+// مسار للتحقق من الكود
+app.post('/verify-otp', (req, res) => {
+    const { email, code } = req.body;
+    if (otpStorage[email] === code) {
+        delete otpStorage[email]; // حذف الكود بعد الاستخدام
+        res.json({ success: true });
+    } else {
+        res.status(400).json({ success: false, message: "الكود خاطئ" });
+    }
 }); 
+

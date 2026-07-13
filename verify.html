@@ -2,45 +2,38 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>التحقق من EcoTechDZ</title>
+    <title>التحقق من الحساب - EcoTechDZ</title>
     <style>
-        body { font-family: 'Arial', sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; border-top: 10px solid #006233; width: 350px; }
-        .logo { font-size: 50px; margin-bottom: 10px; color: #006233; }
-        h2 { color: #006233; }
-        input { width: 80%; padding: 12px; margin: 20px 0; border: 2px solid #ddd; border-radius: 5px; text-align: center; font-size: 18px; }
-        button { background-color: #D21034; color: white; border: none; padding: 12px 30px; border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%; }
-        button:hover { background-color: #a80d29; }
+        body { font-family: Arial, sans-serif; padding: 50px; background-color: #f4f4f4; text-align: center; }
+        .container { background: #fff; padding: 30px; border-radius: 10px; max-width: 400px; margin: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #218838; }
     </style>
-</head><link rel="stylesheet" href="style.css">
-
+</head>
 <body>
-    <nav style="background: #287456; padding: 15px; color: white; text-align: center; margin-bottom: 20px;">
-    <a href="index.html" style="color: white; margin: 0 10px; text-decoration: none;">الرئيسية</a>
-    <a href="dashboard.html" style="color: white; margin: 0 10px; text-decoration: none;">لوحة التحكم</a>
-    <a href="signup.html" style="color: white; margin: 0 10px; text-decoration: none;">التسجيل</a>
-    <a href="verify.html" style="color: white; margin: 0 10px; text-decoration: none;">التحقق</a>
-</nav>
 
-
-
-<div class="card">
-    <div class="logo">♻️</div>
-    <h2>EcoTechDZ</h2>
-    <p>أدخل كود التحقق المرسل لبريدك الإلكتروني</p>
-    <input type="text" id="code" placeholder="000000" maxlength="6">
-    <button onclick="verify()">تأكيد التسجيل</button>
+<div class="container">
+    <h2>التحقق من البريد الإلكتروني</h2>
+    <p>لقد أرسلنا كود التحقق إلى بريدك، يرجى إدخاله أدناه:</p>
+    <input type="text" id="otpCode" placeholder="أدخل الكود المكون من 6 أرقام" required>
+    <button onclick="verifyAndRegister()">تأكيد التسجيل</button>
 </div>
 
 <script>
-    function verify() {
-        const code = document.getElementById('code').value;
-        // هنا نختبر الكود (حالياً يقبل أي شيء بما أننا أوقفنا الإيميل الحقيقي)
-        if(code === "123456") {
-            alert("تم التحقق بنجاح! مرحباً بك في EcoTechDZ");
+    function verifyAndRegister() {
+        // استرجاع الكود الذي خزنّاه سابقاً من صفحة التسجيل
+        const savedOTP = localStorage.getItem("myGeneratedOTP");
+        const userOTP = document.getElementById('otpCode').value;
+
+        if (userOTP === savedOTP) {
+            alert("تم التحقق بنجاح! مرحباً بك في EcoTechDZ.");
+            // مسح الكود من الذاكرة للأمان
+            localStorage.removeItem("myGeneratedOTP");
+            // الانتقال التلقائي إلى لوحة التحكم
             window.location.href = "dashboard.html";
         } else {
-            alert("الكود غير صحيح، يرجى المحاولة مجدداً.");
+            alert("عذراً، الكود غير صحيح. يرجى التأكد من الكود المرسل للإيميل.");
         }
     }
 </script>

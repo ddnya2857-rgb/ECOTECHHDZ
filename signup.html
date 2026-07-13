@@ -2,83 +2,50 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>تسجيل في EcoTechDZ</title>
+    <title>تسجيل EcoTechDZ</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; }
         form { background: #fff; padding: 20px; border-radius: 8px; max-width: 400px; margin: auto; }
-        input, select, button { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; }
+        input, button { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; }
         button { background-color: #28a745; color: white; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <form id="signupForm">
-    <input type="number" id="wasteQuantity" placeholder="كمية النفايات (بالكيلوغرام)" required> 
     <h2>إنشاء حساب جديد</h2>
     <input type="text" id="fullName" placeholder="الاسم الكامل" required>
     <input type="email" id="email" placeholder="البريد الإلكتروني" required>
     <input type="password" id="password" placeholder="كلمة المرور" required>
-   
-    <label for="userType">نوع المستخدم:</label>
-    <select id="userType" required>
-        <option value="individual">فرد</option>
-        <option value="public_institution">مؤسسة عمومية</option>
-        <option value="private_company">مؤسسة خاصة</option>
-        <option value="recycling_center">مركز إعادة تدوير</option>
-        <option value="workshop">ورشة صناعية</option>
-        <option value="transport_truck">شاحنة نقل</option>
-        <option value="waste_collector">جامع نفايات</option>
-    </select>
-   
-    <button type="submit">التسجيل والتحقق</button>
+    <button type="button" id="sendBtn" onclick="sendOTP()">إرسال كود التحقق</button>
 </form>
 
-<script>
-    // دالة الحصول على الموقع
-    function getUserLocation(callback) {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((position) => {
-                callback({
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                });
-            }, (error) => {
-                alert("يرجى تفعيل الموقع لتسهيل عمليات النقل.");
-                callback(null);
-            });
-        } else {
-            alert("متصفحك لا يدعم نظام تحديد المواقع.");
-            callback(null);
-        }
-    }
+<script type="text/javascript">
+    emailjs.init("DrsQFDKtRE2nbijaO");
 
-    // عملية التسجيل
-    document.getElementById('signupForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        getUserLocation((location) => {
-           const userData = {
-    fullName: document.getElementById('fullName').value,
-    email: document.getElementById('email').value,
-    password: document.getElementById('password').value,
-    userType: document.getElementById('userType').value,
-    wasteQuantity: document.getElementById('wasteQuantity').value, // إضافة الكمية
-    location: location
-};  
-
-            fetch('/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(userData)
-            })
-            .then(res => res.text())
-            .then(data => {
-                alert("تم التسجيل بنجاح!");
-            })
-            .catch(err => console.error("خطأ:", err));
+    function sendOTP() {
+        const userEmail = document.getElementById('email').value;
+        if (!userEmail) { alert("يرجى إدخال البريد الإلكتروني"); return; }
+        
+        const generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+        localStorage.setItem("myGeneratedOTP", generatedOTP);
+        
+        document.getElementById('sendBtn').innerText = "جاري الإرسال...";
+        
+        emailjs.send("service_me5o2lp", "template_f2zzbb6", {
+            email: userEmail,
+            passcode: generatedOTP
+        }).then(() => {
+            alert("تم إرسال الكود! سيتم تحويلك لصفحة التحقق.");
+            window.location.href = "verify.html";
+        }, (err) => {
+            alert("فشل الإرسال: " + JSON.stringify(err));
+            document.getElementById('sendBtn').innerText = "إرسال كود التحقق";
         });
-    });
+    }
 </script>
 
 </body>
-</html> 
+</html>
+

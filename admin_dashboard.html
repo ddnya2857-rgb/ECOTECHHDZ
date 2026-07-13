@@ -1,52 +1,50 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <title>لوحة تحكم EcoTechDZ</title>
+    <meta charset="UTF-8">
+    <title>لوحة إدارة EcoTechDZ</title>
     <style>
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        th { background-color: #f2f2f2; }
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f8f9fa; }
+        .container { background: #fff; padding: 20px; border-radius: 8px; max-width: 600px; margin: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h2 { color: #333; }
+        ul { list-style: none; padding: 0; }
+        li { padding: 10px; border-bottom: 1px solid #eee; }
     </style>
 </head>
 <body>
-    <h2>قائمة المستخدمين المسجلين</h2>
-    <table id="usersTable">
-        <thead>
-            <tr>
-                <th>الاسم</th>
-                <th>نوع المستخدم</th>
-                <th>الموقع (الإحداثيات)</th>
-                <th>كمية النفايات (كغ)</th>
-            </tr>
-        </thead>
-        <tbody id="usersBody"></tbody>
-    </table>
 
-    <script>
-    // جلب البيانات من السيرفر
-    fetch('/get-users')
-        .then(res => res.json())
+<div class="container">
+    <h2>لوحة إدارة النظام</h2>
+    <p>أهلاً بكِ يا مديرة، هذه قائمة المستخدمين المسجلين:</p>
+    <ul id="userList">تحميل البيانات...</ul>
+    <button onclick="window.location.href='index.html'">العودة للرئيسية</button>
+</div>
+
+<script>
+    // 1. كود الحماية (يمنع دخول غير المديرين)
+    const userRole = localStorage.getItem("userRole");
+    if (userRole !== "admin") {
+        alert("عذراً، هذه الصفحة مخصصة للمدير فقط!");
+        window.location.href = "index.html";
+    }
+
+    // 2. كود جلب وعرض البيانات من ملف users.json
+    fetch('users.json')
+        .then(response => response.json())
         .then(data => {
-            const tbody = document.getElementById('usersBody');
-            tbody.innerHTML = ''; // تفريغ الجدول قبل التعبئة
+            const list = document.getElementById('userList');
+            list.innerHTML = ""; // مسح كلمة "تحميل البيانات"
+            data.forEach(user => {
+                const li = document.createElement('li');
+                li.innerHTML = `<strong>${user.fullName}</strong> - البريد: ${user.email}`;
+                list.appendChild(li);
+            });
+        })
+        .catch(error => {
+            document.getElementById('userList').innerHTML = "لا توجد بيانات أو خطأ في الاتصال بالملف.";
+            console.error('خطأ:', error);
+        });
+</script>
 
-            // هذه هي حلقة foreach التي تبحثين عنها
-           data.forEach(user => {
-    // التأكد من وجود إحداثيات الموقع
-    const locText = user.location ? `${user.location.lat.toFixed(4)}, ${user.location.lng.toFixed(4)}` : 'غير محدد';
-   
-    // بناء الصف (Row) داخل الجدول
-    const row = `<tr>
-        <td>${user.fullName}</td>
-        <td>${user.userType}</td>
-        <td>${locText}</td>
-        <td>${user.wasteQuantity || 0} كغ</td>
-    </tr>`;
-   
-    // إضافة الصف إلى جسم الجدول
-    tbody.innerHTML += row;
-});  
-</script> 
 </body>
-</html>
-
+</html> 
