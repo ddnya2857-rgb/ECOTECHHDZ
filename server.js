@@ -1,5 +1,9 @@
 const express = require('express');
 const path = require('path');
+// ... داخل مسار /get-users
+const filePath = path.join(__dirname, 'users.json');
+const users = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+res.json(users); 
 const fs = require('fs');
 const app = express();
 
