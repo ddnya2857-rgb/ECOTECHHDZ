@@ -1,104 +1,88 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-<head><link rel="stylesheet" href="style.css">
-
+<head>
+    <link rel="stylesheet" href="style.css">
     <meta charset="UTF-8">
     <title>EcoTechDZ - منصة الاستدامة</title>
     <style>
         :root { --green: #006233; --red: #D21034; --white: #FFFFFF; }
         body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; }
         header { background: linear-gradient(to right, var(--green), #008044); color: var(--white); padding: 20px; border-radius: 15px; text-align: center; border-bottom: 5px solid var(--red); }
-        .flag-bar { height: 10px; display: flex; border-radius: 5px; overflow: hidden; margin-bottom: 10px; }
-        .green-part { flex: 1; background: var(--green); }
-        .white-part { flex: 1; background: var(--white); }
-        .red-part { flex: 1; background: var(--red); }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; }
         .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        select, input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        button { background: var(--green); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button { background: var(--green); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
         button:hover { background: var(--red); }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: center; }
         th { background-color: #f8f9fa; color: var(--green); }
     </style>
-</head
+</head>
+<body>
+
 <nav style="background: #287456; padding: 15px; color: white; text-align: center; margin-bottom: 20px;">
     <a href="index.html" style="color: white; margin: 0 10px; text-decoration: none;">الرئيسية</a>
     <a href="dashboard.html" style="color: white; margin: 0 10px; text-decoration: none;">لوحة التحكم</a>
-    <a href="signup.html" style="color: white; margin: 0 10px; text-decoration: none;">التسجيل</a>
-    <a href="verify.html" style="color: white; margin: 0 10px; text-decoration: none;">التحقق</a>
 </nav>
->
-<body>
-
-
-<div class="flag-bar"><div class="green-part"></div><div class="white-part"></div><div class="red-part"></div></div>
 
 <header>
-    <h1>EcoTechDZ ♻️</h1>
+    <h1>EcoTechDZ</h1>
     <p>منصة ذكية لتدوير النفايات في الجزائر</p>
 </header>
 
 <div class="grid">
     <div class="card">
-        <h3>تصنيف النفايات 🗑️</h3>
+        <h3>تصنيف النفايات</h3>
         <select id="wasteType">
-            <option value="5|بلاستيك">بلاستيك 🧴 (5 نقاط/كغ)</option>
-            <option value="3|ورق">ورق وكرتون 📦 (3 نقاط/كغ)</option>
-            <option value="10|معادن">معادن 🥫 (10 نقاط/كغ)</option>
-            <option value="7|زجاج">زجاج 🍾 (7 نقاط/كغ)</option>
+            <option value="5|بلاستيك">بلاستيك (5 نقاط / كغ)</option>
+            <option value="3|ورق">ورق وكرتون (3 نقاط / كغ)</option>
+            <option value="10|معادن">معادن (10 نقاط / كغ)</option>
+            <option value="7|زجاج">زجاج (7 نقاط / كغ)</option>
         </select>
         <input type="number" id="quantity" placeholder="الوزن (كيلوغرام)">
         <button onclick="addWaste()">إضافة العملية وكسب النقاط</button>
     </div>
-
     <div class="card" style="border-top: 5px solid var(--green);">
-        <h3>رصيدك البيئي ♻️</h3>
+        <h3>رصيدك البيئي</h3>
         <div id="user-points" style="font-size: 40px; color: var(--green); font-weight: bold;">0</div>
         <p>نقطة مكتسبة</p>
     </div>
 </div>
 
-<!-- جدول العمليات الأخيرة -->
 <div class="card" style="margin-top: 20px;">
-    <h3>سجل العمليات الأخيرة 📋</h3>
+    <h3>سجل العمليات الأخيرة</h3>
     <table id="historyTable">
-        <thead>
-            <tr>
-                <th>النوع</th>
-                <th>الوزن (كغ)</th>
-                <th>النقاط</th>
-                <th>التاريخ</th>
-            </tr>
-        </thead>
-        <tbody id="historyBody">
-            <!-- ستضاف العمليات هنا برمجياً -->
-        </tbody>
+        <thead><tr><th>النوع</th><th>الوزن (كغ)</th><th>النقاط</th><th>التاريخ</th></tr></thead>
+        <tbody id="historyBody"></tbody>
     </table>
+</div>
+
+<!-- قسم خاص بالمدير - يظهر فقط لدنيا -->
+<div id="admin-section" class="card" style="margin-top: 20px; display: none; background: #fff3f3; border: 2px solid var(--red);">
+    <h3>لوحة تحكم المدير</h3>
+    <button style="background: var(--red);" onclick="window.location.href='admin_dashboard.html'">عرض قائمة المستخدمين</button>
 </div>
 
 <script>
     let totalPoints = 0;
-
     function addWaste() {
         const select = document.getElementById('wasteType');
-        const valueParts = select.value.split('|'); // تقسيم القيمة والاسم
+        const valueParts = select.value.split('|');
         const pointsPerKg = parseInt(valueParts[0]);
         const typeName = valueParts[1];
         const qty = parseFloat(document.getElementById('quantity').value);
-       
         if(qty > 0) {
             const earned = pointsPerKg * qty;
             totalPoints += earned;
             document.getElementById('user-points').innerText = totalPoints;
-           
-            // إضافة سطر جديد للجدول
             const table = document.getElementById('historyBody');
-            const row = table.insertRow(0); // إضافة السطر في الأعلى
+            const row = table.insertRow(0);
             row.innerHTML = `<td>${typeName}</td><td>${qty}</td><td>${earned}</td><td>${new Date().toLocaleTimeString()}</td>`;
-        } else {
-            alert("يرجى إدخال وزن صحيح");
-        }
+        } else { alert("يرجى إدخال وزن صحيح"); }
+    }
+
+    // التحقق من هوية المدير
+    if(localStorage.getItem("userEmail") === "ddnya2857@gmail.com") {
+        document.getElementById("admin-section").style.display = "block";
     }
 </script>
 
