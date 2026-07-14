@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>الرئيسية - EcoTechDZ</title>
+    <title>EcoTechDZ - الرئيسية</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; padding: 20px; }
         .nav-bar { background: #287456; padding: 15px; color: white; text-align: center; border-radius: 5px; margin-bottom: 20px; }
@@ -12,13 +12,12 @@
     </style>
 </head>
 <body>
-    <!-- الربط التسلسلي (شريط التنقل) -->
+
     <nav class="nav-bar">
         <a href="signup.html" style="color: white; margin: 0 5px;">التسجيل</a>
         <a href="verify.html" style="color: white; margin: 0 5px;">التحقق</a>
         <a href="index.html" style="color: white; margin: 0 5px;">الرئيسية</a>
         <a href="dashboard.html" style="color: white; margin: 0 5px;">لوحة التحكم</a>
-        <a id="admin-link" href="admin_dashboard.html" style="color: #ffcccc; margin: 0 5px; font-weight: bold; display: none;">قائمة المستخدمين</a>
     </nav>
 
     <div style="text-align: center;">
@@ -35,19 +34,56 @@
 
     <div class="box">
         <h3>بيانات العملية والربط</h3>
-        <input type="text" id="wasteType" placeholder="نوع النفايات (بلاستيك/معادن/ورق/زجاج)">
-        <input type="text" id="weight" placeholder="الوزن (كغ)">
-        <input type="text" id="price" placeholder="المبلغ (دج)">
-        <select id="actionType"><option>بيع</option><option>شراء</option></select>
-        <select id="paymentMethod"><option>عند التسليم</option><option>البطاقة الذهبية</option><option>بريدي موب</option></select>
-        <input type="text" id="userType" placeholder="نوع المستخدم (فرد/مؤسسة/ورشة/ناقل)">
-        <input type="text" id="location" value="سكيكدة" placeholder="الموقع">
-        <button onclick="getLocation()" style="background:#6c757d;">تفعيل GPS للربط مع المستخدمين</button>
+        <select id="wasteType" onchange="updatePrice()">
+            <option value="">اختر نوع النفايات</option>
+            <option value="بلاستيك">بلاستيك</option>
+            <option value="معادن">معادن</option>
+            <option value="ورق">ورق</option>
+            <option value="زجاج">زجاج</option>
+        </select>
+       
+        <input type="number" id="weight" placeholder="الوزن (كغ)" oninput="updatePrice()">
+        <input type="text" id="price" placeholder="المبلغ (دج)" readonly>
+       
+        <select id="actionType">
+            <option>بيع</option>
+            <option>شراء</option>
+        </select>
+       
+        <select id="paymentMethod" onchange="togglePaymentFields()">
+            <option value="عند التسليم">عند التسليم</option>
+            <option value="بريدي موب">بريدي موب</option>
+            <option value="البطاقة الذهبية">البطاقة الذهبية</option>
+        </select>
+
+        <div id="paymentDetails" style="display:none;">
+            <input type="text" id="cardNumber" placeholder="رقم البطاقة / الحساب">
+            <input type="password" id="cardCode" placeholder="كود التحقق">
+        </div>
+
+        <input type="text" id="userType" placeholder="نوع المستخدم (فرد / مؤسسة / ورشة / ناقل)">
+        <input type="text" id="location" value="سكيكدة" readonly>
+       
+        <button onclick="getLocation()" style="background:#6c757d;">للربط مع GPS</button>
         <button onclick="submitTransaction()" style="background:#dc3545; margin-top: 10px;">تأكيد العملية</button>
     </div>
 
     <script>
-        if(localStorage.getItem("userEmail") === "ddnya2857@gmail.com") document.getElementById("admin-link").style.display = "inline";
+        const priceList = { "بلاستيك": 20, "معادن": 80, "ورق": 10, "زجاج": 5 };
+
+        function updatePrice() {
+            const type = document.getElementById('wasteType').value;
+            const weight = document.getElementById('weight').value;
+            if(priceList[type] && weight) {
+                document.getElementById('price').value = priceList[type] * weight;
+            }
+        }
+
+        function togglePaymentFields() {
+            const method = document.getElementById('paymentMethod').value;
+            document.getElementById('paymentDetails').style.display =
+                (method === "بريدي موب" || method === "البطاقة الذهبية") ? "block" : "none";
+        }
 
         async function startCamera() {
             const video = document.getElementById('webcam');
@@ -57,17 +93,35 @@
         function classifyWaste() {
             document.getElementById('wasteType').value = "بلاستيك";
             document.getElementById('weight').value = "0.5";
-            document.getElementById('price').value = "15";
+            updatePrice();
             alert("تم رصد النفايات وتحديد الوزن!");
         }
 
         function getLocation() {
             navigator.geolocation.getCurrentPosition(pos => {
-                alert("تم تحديد موقعك في سكيكدة والربط مع أقرب المشترين/البائعين.");
+                alert("تم تحديد موقعك في سكيكدة والربط مع أقرب المشترين / البائعين.");
             });
         }
 
-        function submitTransaction() { alert("تم تسجيل العملية في منصة الاقتصاد الدائري بنجاح!"); }
+        function submitTransaction() {
+            const transaction = {
+                type: document.getElementById('wasteType').value,
+                weight: document.getElementById('weight').value,
+                price: document.getElementById('price').value,
+                userType: document.getElementById('userType').value,
+                points: parseFloat(document.getElementById('price').value) * 0.1,
+                date: new Date().toLocaleDateString()
+            };
+
+            let history = JSON.parse(localStorage.getItem('allOperations') || "[]");
+            history.push(transaction);
+            localStorage.setItem('allOperations', JSON.stringify(history));
+
+            let currentPoints = parseFloat(localStorage.getItem("userPoints") || 0);
+            localStorage.setItem("userPoints", currentPoints + transaction.points);
+
+            alert("تم تسجيل العملية بنجاح! النقاط المكتسبة: " + transaction.points);
+        }
     </script>
 </body>
 </html> 
