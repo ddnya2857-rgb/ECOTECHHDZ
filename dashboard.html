@@ -2,9 +2,9 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>لوحة التحكم - EcoTechDZ</title>
+    <title>EcoTechDZ - لوحة التحكم</title>
     <style>
-        :root { --green: #006233; --red: #D21034; }
+        :root { --green: #006233; }
         body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; padding: 20px; }
         .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-top: 20px; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
@@ -22,49 +22,64 @@
     <div class="card">
         <h3>رصيدك البيئي التراكمي</h3>
         <div id="user-points" style="font-size: 40px; color: var(--green); font-weight: bold;">0</div>
-        <p>نقطة مكتسبة من جميع العمليات</p>
+        <p>نقطة مكتسبة (للأفراد عند عمليات البيع فقط)</p>
     </div>
 
     <div class="card">
         <h3>سجل العمليات الشامل</h3>
         <table id="historyTable">
             <thead>
-                <tr><th>النوع</th><th>الوزن (كغ)</th><th>النقاط</th><th>التاريخ</th></tr>
+                <tr>
+                    <th>النوع</th>
+                    <th>نوع المستخدم</th>
+                    <th>نوع العملية</th>
+                    <th>الوزن (كغ)</th>
+                    <th>النقاط</th>
+                    <th>التاريخ</th>
+                </tr>
             </thead>
             <tbody id="historyBody"></tbody>
         </table>
     </div>
 
-    <!-- قسم خاص بالمدير - يظهر فقط لدنيا -->
-    <div id="admin-section" class="card" style="display: none; border: 2px solid var(--red);">
-        <h3>لوحة تحكم المدير (الإحصائيات)</h3>
-        <p id="admin-stats">جاري تحميل إحصائيات النظام...</p>
-        <button onclick="window.location.href='admin_dashboard.html'" style="background: var(--red); color: white; padding: 10px; border: none; cursor: pointer;">عرض قائمة المستخدمين الكاملة</button>
-    </div>
-
     <script>
-        // 1. عرض العمليات المسجلة من الـ LocalStorage
         function loadOperations() {
+            // سحب كافة العمليات من التخزين المحلي
             const history = JSON.parse(localStorage.getItem('allOperations') || "[]");
             const tbody = document.getElementById('historyBody');
             let totalPoints = 0;
            
-            tbody.innerHTML = ""; // تنظيف الجدول
+            tbody.innerHTML = "";
+           
             history.forEach(item => {
                 let row = tbody.insertRow();
-                row.innerHTML = `<td>${item.type}</td><td>${item.weight}</td><td>${item.points}</td><td>${item.date}</td>`;
-                totalPoints += parseFloat(item.points || 0);
+               
+                // تنظيف البيانات
+                let userType = (item.userType || "").trim();
+                let actionType = (item.actionType || "").trim();
+                let points = parseFloat(item.points || 0);
+
+                // منطق احتساب النقاط: فرد + بيع فقط
+                let pointsForThisRow = 0;
+                if (userType === "فرد" && actionType === "بيع") {
+                    pointsForThisRow = points;
+                }
+               
+                totalPoints += pointsForThisRow;
+
+                // عرض البيانات كما هي مخزنة في الـ localStorage
+                row.innerHTML = `
+                    <td>${item.type || '-'}</td>
+                    <td>${userType || '-'}</td>
+                    <td>${actionType || '-'}</td>
+                    <td>${item.weight || 0}</td>
+                    <td>${pointsForThisRow}</td>
+                    <td>${item.date || '-'}</td>
+                `;
             });
            
+            // عرض الإجمالي
             document.getElementById('user-points').innerText = totalPoints;
-        }
-
-        // 2. تفعيل صلاحيات المدير
-        if(localStorage.getItem("userEmail") === "ddnya2857@gmail.com") {
-            document.getElementById("admin-section").style.display = "block";
-            const history = JSON.parse(localStorage.getItem('allOperations') || "[]");
-            const adminStats = document.getElementById('admin-stats');
-            adminStats.innerHTML = `إجمالي عدد العمليات: ${history.length} عملية.`;
         }
 
         loadOperations();

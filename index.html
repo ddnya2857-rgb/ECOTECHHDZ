@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>EcoTechDZ - الرئيسية</title>
+    <title>الرئيسية - EcoTechDZ</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; padding: 20px; }
         .nav-bar { background: #287456; padding: 15px; color: white; text-align: center; border-radius: 5px; margin-bottom: 20px; }
@@ -26,10 +26,10 @@
     </div>
 
     <div class="box">
-        <h3>الكاميرا الذكية: تصنيف ووزن</h3>
+        <h3>الكاميرا الذكية : تصنيف ووزن</h3>
         <video id="webcam" width="100%" autoplay playsinline style="background:#000;"></video>
         <button onclick="startCamera()">تشغيل الكاميرا</button>
-        <button onclick="classifyWaste()" style="background:#007bff;">بدء التصنيف التلقائي</button>
+        <button onclick="classifyWaste()" style="background:#007bff">بدء التصنيف التلقائي</button>
     </div>
 
     <div class="box">
@@ -41,15 +41,14 @@
             <option value="ورق">ورق</option>
             <option value="زجاج">زجاج</option>
         </select>
-       
         <input type="number" id="weight" placeholder="الوزن (كغ)" oninput="updatePrice()">
         <input type="text" id="price" placeholder="المبلغ (دج)" readonly>
        
         <select id="actionType">
-            <option>بيع</option>
-            <option>شراء</option>
+            <option value="بيع">بيع</option>
+            <option value="شراء">شراء</option>
         </select>
-       
+
         <select id="paymentMethod" onchange="togglePaymentFields()">
             <option value="عند التسليم">عند التسليم</option>
             <option value="بريدي موب">بريدي موب</option>
@@ -61,28 +60,37 @@
             <input type="password" id="cardCode" placeholder="كود التحقق">
         </div>
 
-        <input type="text" id="userType" placeholder="نوع المستخدم (فرد / مؤسسة / ورشة / ناقل)">
+        <select id="userType">
+            <option value="فرد">فرد</option>
+            <option value="مؤسسة عمومية أو خاصة">مؤسسة عمومية أو خاصة</option>
+            <option value="فندق">فندق</option>
+            <option value="مطعم">مطعم</option>
+            <option value="محل تجاري">محل تجاري</option>
+            <option value="ناقل صاحب شاحنة نقل">ناقل صاحب شاحنة نقل</option>
+            <option value="جامع نفايات">جامع نفايات</option>
+            <option value="مركز إعادة تدوير">مركز إعادة تدوير</option>
+            <option value="ورشة صناعية">ورشة صناعية</option>
+        </select>
+
         <input type="text" id="location" value="سكيكدة" readonly>
-       
-        <button onclick="getLocation()" style="background:#6c757d;">للربط مع GPS</button>
-        <button onclick="submitTransaction()" style="background:#dc3545; margin-top: 10px;">تأكيد العملية</button>
+        <button onclick="getLocation()" style="background:#6c757d">تحديد الموقع (GPS)</button>
+        <button onclick="submitTransaction()" style="background:#dc3545; margin-top:10px;">تأكيد العملية</button>
     </div>
 
     <script>
-        const priceList = { "بلاستيك": 20, "معادن": 80, "ورق": 10, "زجاج": 5 };
-
+        const pricelist = {"بلاستيك": 5, "معادن": 20, "ورق": 10, "زجاج": 8};
+       
         function updatePrice() {
             const type = document.getElementById('wasteType').value;
             const weight = document.getElementById('weight').value;
-            if(priceList[type] && weight) {
-                document.getElementById('price').value = priceList[type] * weight;
+            if(pricelist[type] && weight) {
+                document.getElementById('price').value = pricelist[type] * weight;
             }
         }
 
         function togglePaymentFields() {
             const method = document.getElementById('paymentMethod').value;
-            document.getElementById('paymentDetails').style.display =
-                (method === "بريدي موب" || method === "البطاقة الذهبية") ? "block" : "none";
+            document.getElementById('paymentDetails').style.display = (method === "بريدي موب" || method === "البطاقة الذهبية") ? "block" : "none";
         }
 
         async function startCamera() {
@@ -98,29 +106,30 @@
         }
 
         function getLocation() {
-            navigator.geolocation.getCurrentPosition(pos => {
-                alert("تم تحديد موقعك في سكيكدة والربط مع أقرب المشترين / البائعين.");
-            });
+            alert("تم تحديد موقعك في سكيكدة والربط مع أقرب المشترين / البائعين.");
         }
 
         function submitTransaction() {
+            const price = parseFloat(document.getElementById('price').value) || 0;
+            const action = document.getElementById('actionType').value;
+            const user = document.getElementById('userType').value;
+           
             const transaction = {
                 type: document.getElementById('wasteType').value,
                 weight: document.getElementById('weight').value,
-                price: document.getElementById('price').value,
-                userType: document.getElementById('userType').value,
-                points: parseFloat(document.getElementById('price').value) * 0.1,
-                date: new Date().toLocaleDateString()
+                price: price,
+                userType: user,
+                actionType: action,
+                date: new Date().toLocaleDateString(),
+                points: (user === "فرد" && action === "بيع") ? (price * 0.1) : 0
             };
 
             let history = JSON.parse(localStorage.getItem('allOperations') || "[]");
             history.push(transaction);
             localStorage.setItem('allOperations', JSON.stringify(history));
 
-            let currentPoints = parseFloat(localStorage.getItem("userPoints") || 0);
-            localStorage.setItem("userPoints", currentPoints + transaction.points);
-
-            alert("تم تسجيل العملية بنجاح! النقاط المكتسبة: " + transaction.points);
+            alert("تم تسجيل العملية بنجاح! تم احتساب النقاط (للأفراد عند البيع).");
+            window.location.href = 'dashboard.html';
         }
     </script>
 </body>
