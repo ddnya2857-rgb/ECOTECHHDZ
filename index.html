@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>الرئيسية - EcoTechDZ</title>
+    <title>EcoTechDZ - الرئيسية</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; padding: 20px; }
         .nav-bar { background: #287456; padding: 15px; color: white; text-align: center; border-radius: 5px; margin-bottom: 20px; }
@@ -13,124 +13,124 @@
 </head>
 <body>
 
-    <nav class="nav-bar">
-        <a href="signup.html" style="color: white; margin: 0 5px;">التسجيل</a>
-        <a href="verify.html" style="color: white; margin: 0 5px;">التحقق</a>
-        <a href="index.html" style="color: white; margin: 0 5px;">الرئيسية</a>
-        <a href="dashboard.html" style="color: white; margin: 0 5px;">لوحة التحكم</a>
-    </nav>
+<nav class="nav-bar">
+    <a href="signup.html" style="color: white; margin: 0 5px;">التسجيل</a>
+    <a href="verify.html" style="color: white; margin: 0 5px;">التحقق</a>
+    <a href="index.html" style="color: white; margin: 0 5px;">الرئيسية</a>
+    <a href="dashboard.html" style="color: white; margin: 0 5px;">لوحة التحكم</a>
+</nav>
 
-    <div style="text-align: center;">
-        <h1>الاقتصاد الدائري - سكيكدة</h1>
-        <h3>نحو جزائر خضراء</h3>
+<div style="text-align: center;">
+    <h1>EcoTechDZ - الاقتصاد الدائري في سكيكدة</h1>
+    <h3>نحو جزائر خضراء</h3>
+</div>
+
+<div class="box">
+    <h3>الكاميرا الذكية: تصنيف ووزن</h3>
+    <video id="webcam" width="100%" autoplay playsinline style="background:#000;"></video>
+    <button onclick="startCamera()">تشغيل الكاميرا</button>
+    <button onclick="classifyWaste()" style="background:#007bff;">بدء التصنيف التلقائي</button>
+</div>
+
+<div class="box">
+    <h3>بيانات العملية والربط</h3>
+    <select id="wasteType" onchange="updatePrice()">
+        <option value="">اختر نوع النفايات</option>
+        <option value="بلاستيك">بلاستيك</option>
+        <option value="معادن">معادن</option>
+        <option value="ورق">ورق</option>
+        <option value="زجاج">زجاج</option>
+    </select>
+    <input type="number" id="weight" placeholder="الوزن (كغ)" oninput="updatePrice()">
+    <input type="text" id="price" placeholder="المبلغ" readonly>
+    <select id="actionType">
+        <option value="بيع">بيع</option>
+        <option value="شراء">شراء</option>
+    </select>
+    <select id="paymentMethod" onchange="togglePaymentFields()">
+        <option value="عند التسليم">عند التسليم</option>
+        <option value="بريدي موب">بريدي موب</option>
+        <option value="البطاقة الذهبية">البطاقة الذهبية</option>
+    </select>
+    <div id="paymentDetails" style="display:none;">
+        <input type="text" id="cardNumber" placeholder="رقم البطاقة / الحساب">
+        <input type="password" id="cardCode" placeholder="كود التحقق">
     </div>
+    <select id="userType">
+        <option value="فرد">فرد</option>
+        <option value="مؤسسة عمومية أو خاصة">مؤسسة عمومية أو خاصة</option>
+        <option value="فندق">فندق</option>
+        <option value="مطعم">مطعم</option>
+        <option value="محل تجاري">محل تجاري</option>
+        <option value="جامع نفايات">جامع نفايات</option>
+        <option value="ناقل صاحب شاحنة نقل">ناقل صاحب شاحنة نقل</option>
+        <option value="مركز إعادة تدوير">مركز إعادة تدوير</option>
+        <option value="ورشة صناعية">ورشة صناعية</option>
+    </select>
+    <input type="text" id="location" value="سكيكدة" readonly>
+    <button onclick="getLocation()" style="background:#6c757d;">تحديد الموقع (GPS)</button>
+    <button onclick="submitTransaction()" style="background:#dc3545; margin-top: 10px;">تأكيد العملية</button>
+</div>
 
-    <div class="box">
-        <h3>الكاميرا الذكية : تصنيف ووزن</h3>
-        <video id="webcam" width="100%" autoplay playsinline style="background:#000;"></video>
-        <button onclick="startCamera()">تشغيل الكاميرا</button>
-        <button onclick="classifyWaste()" style="background:#007bff">بدء التصنيف التلقائي</button>
-    </div>
+<script>
+    const pricelist = {"بلاستيك": 5, "معادن": 20, "ورق": 10, "زجاج": 8};
 
-    <div class="box">
-        <h3>بيانات العملية والربط</h3>
-        <select id="wasteType" onchange="updatePrice()">
-            <option value="">اختر نوع النفايات</option>
-            <option value="بلاستيك">بلاستيك</option>
-            <option value="معادن">معادن</option>
-            <option value="ورق">ورق</option>
-            <option value="زجاج">زجاج</option>
-        </select>
-        <input type="number" id="weight" placeholder="الوزن (كغ)" oninput="updatePrice()">
-        <input type="text" id="price" placeholder="المبلغ (دج)" readonly>
+    function updatePrice() {
+        const type = document.getElementById('wasteType').value;
+        const weight = document.getElementById('weight').value;
+        if(pricelist[type] && weight) {
+            document.getElementById('price').value = pricelist[type] * weight;
+        }
+    }
+
+    function togglePaymentFields() {
+        const method = document.getElementById('paymentMethod').value;
+        document.getElementById('paymentDetails').style.display = (method === "البطاقة الذهبية") ? "block" : "none";
+    }
+
+    async function startCamera() {
+        const video = document.getElementById('webcam');
+        video.srcObject = await navigator.mediaDevices.getUserMedia({ video: true });
+    }
+
+    function classifyWaste() {
+        document.getElementById('wasteType').value = "بلاستيك";
+        document.getElementById('weight').value = "0.5";
+        updatePrice();
+        alert("تم رصد النفايات وتحديد الوزن!");
+    }
+
+    function getLocation() {
+        alert("تم تحديد موقعك في سكيكدة والربط مع أقرب المشترين / البائعين.");
+    }
+
+    function submitTransaction() {
+        const price = parseFloat(document.getElementById('price').value) || 0;
+        const action = document.getElementById('actionType').value;
+        const user = document.getElementById('userType').value;
        
-        <select id="actionType">
-            <option value="بيع">بيع</option>
-            <option value="شراء">شراء</option>
-        </select>
+        // حساب النقاط
+        const points = (action === "بيع" && user === "فرد") ? (price * 0.1) : 0;
 
-        <select id="paymentMethod" onchange="togglePaymentFields()">
-            <option value="عند التسليم">عند التسليم</option>
-            <option value="بريدي موب">بريدي موب</option>
-            <option value="البطاقة الذهبية">البطاقة الذهبية</option>
-        </select>
+        const transaction = {
+            email: localStorage.getItem("loggedInUserEmail") || "غير مسجل",
+            type: document.getElementById('wasteType').value,
+            wasteAmount: document.getElementById('weight').value + " كغ",
+            price: price,
+            points: points,
+            actionType: action,
+            date: new Date().toLocaleDateString()
+        };
 
-        <div id="paymentDetails" style="display:none;">
-            <input type="text" id="cardNumber" placeholder="رقم البطاقة / الحساب">
-            <input type="password" id="cardCode" placeholder="كود التحقق">
-        </div>
+        // التخزين في operationsHistory المخصص للوحة المدير
+        let history = JSON.parse(localStorage.getItem('operationsHistory') || "[]");
+        history.push(transaction);
+        localStorage.setItem('operationsHistory', JSON.stringify(history));
 
-        <select id="userType">
-            <option value="فرد">فرد</option>
-            <option value="مؤسسة عمومية أو خاصة">مؤسسة عمومية أو خاصة</option>
-            <option value="فندق">فندق</option>
-            <option value="مطعم">مطعم</option>
-            <option value="محل تجاري">محل تجاري</option>
-            <option value="ناقل صاحب شاحنة نقل">ناقل صاحب شاحنة نقل</option>
-            <option value="جامع نفايات">جامع نفايات</option>
-            <option value="مركز إعادة تدوير">مركز إعادة تدوير</option>
-            <option value="ورشة صناعية">ورشة صناعية</option>
-        </select>
+        alert("تم تسجيل العملية بنجاح في سجل العمليات!");
+        window.location.href = 'dashboard.html';
+    }
+</script>
 
-        <input type="text" id="location" value="سكيكدة" readonly>
-        <button onclick="getLocation()" style="background:#6c757d">تحديد الموقع (GPS)</button>
-        <button onclick="submitTransaction()" style="background:#dc3545; margin-top:10px;">تأكيد العملية</button>
-    </div>
-
-    <script>
-        const pricelist = {"بلاستيك": 5, "معادن": 20, "ورق": 10, "زجاج": 8};
-       
-        function updatePrice() {
-            const type = document.getElementById('wasteType').value;
-            const weight = document.getElementById('weight').value;
-            if(pricelist[type] && weight) {
-                document.getElementById('price').value = pricelist[type] * weight;
-            }
-        }
-
-        function togglePaymentFields() {
-            const method = document.getElementById('paymentMethod').value;
-            document.getElementById('paymentDetails').style.display = (method === "بريدي موب" || method === "البطاقة الذهبية") ? "block" : "none";
-        }
-
-        async function startCamera() {
-            const video = document.getElementById('webcam');
-            video.srcObject = await navigator.mediaDevices.getUserMedia({ video: true });
-        }
-
-        function classifyWaste() {
-            document.getElementById('wasteType').value = "بلاستيك";
-            document.getElementById('weight').value = "0.5";
-            updatePrice();
-            alert("تم رصد النفايات وتحديد الوزن!");
-        }
-
-        function getLocation() {
-            alert("تم تحديد موقعك في سكيكدة والربط مع أقرب المشترين / البائعين.");
-        }
-
-        function submitTransaction() {
-            const price = parseFloat(document.getElementById('price').value) || 0;
-            const action = document.getElementById('actionType').value;
-            const user = document.getElementById('userType').value;
-           
-            const transaction = {
-                type: document.getElementById('wasteType').value,
-                weight: document.getElementById('weight').value,
-                price: price,
-                userType: user,
-                actionType: action,
-                date: new Date().toLocaleDateString(),
-                points: (user === "فرد" && action === "بيع") ? (price * 0.1) : 0
-            };
-
-            let history = JSON.parse(localStorage.getItem('allOperations') || "[]");
-            history.push(transaction);
-            localStorage.setItem('allOperations', JSON.stringify(history));
-
-            alert("تم تسجيل العملية بنجاح! تم احتساب النقاط (للأفراد عند البيع).");
-            window.location.href = 'dashboard.html';
-        }
-    </script>
 </body>
 </html> 

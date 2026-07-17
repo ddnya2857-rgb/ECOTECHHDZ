@@ -2,24 +2,55 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>إدارة النظام - EcoTechDZ</title>
+    <title>EcoTechDZ - لوحة تحكم المدير</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f7f6; padding: 20px; }
+        h2 { text-align: center; color: #28a745; margin-bottom: 30px; }
+        .container { max-width: 1000px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+        th { background-color: #28a745; color: white; }
+    </style>
 </head>
 <body>
-    <nav style="background: #287456; padding: 15px; color: white; text-align: center; margin-bottom: 20px;">
-        <a href="signup.html" style="color: white; margin: 0 10px; text-decoration: none;">التسجيل</a>
-        <a href="verify.html" style="color: white; margin: 0 10px; text-decoration: none;">التحقق</a>
-        <a href="index.html" style="color: white; margin: 0 10px; text-decoration: none;">الرئيسية</a>
-        <a href="dashboard.html" style="color: white; margin: 0 10px; text-decoration: none;">لوحة التحكم</a>
-        <a id="admin-link" href="admin_dashboard.html" style="color: #ffcccc; margin: 0 10px; text-decoration: none; font-weight: bold; display: none;">قائمة المستخدمين</a>
-    </nav>
-    <script>
-        if(localStorage.getItem("userEmail") === "ddnya2857@gmail.com") { document.getElementById("admin-link").style.display = "inline"; }
-    </script>
-   
-    <div class="container">
-        <h2>لوحة إدارة النظام</h2>
-        <ul id="userList">تحميل البيانات...</ul>
-    </div>
-    <!-- (ضعي هنا السكريبت الخاص بجلب المستخدمين) -->
+
+<div class="container">
+    <h2>لوحة تحكم EcoTechDZ</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>البريد الإلكتروني</th>
+                <th>نوع العملية</th>
+                <th>كمية النفايات</th>
+                <th>النقاط المكتسبة</th>
+                <th>التاريخ</th>
+            </tr>
+        </thead>
+        <tbody id="adminTableBody"></tbody>
+    </table>
+</div>
+
+<script>
+    // جلب العمليات المسجلة من localStorage تحت اسم operationsHistory
+    const history = JSON.parse(localStorage.getItem('operationsHistory') || "[]");
+    const tableBody = document.getElementById("adminTableBody");
+
+    if (history.length > 0) {
+        history.forEach(op => {
+            const row = `<tr>
+                <td>${op.email}</td>
+                <td>${op.type}</td>
+                <td>${op.wasteAmount}</td>
+                <td>${op.points}</td>
+                <td>${op.date}</td>
+            </tr>`;
+            tableBody.innerHTML += row;
+        });
+    } else {
+        tableBody.innerHTML = "<tr><td colspan='5'>لا توجد عمليات مسجلة حالياً في EcoTechDZ.</td></tr>";
+    }
+</script>
+
 </body>
 </html> 

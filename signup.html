@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>تسجيل EcoTechDZ</title>
+    <title>EcoTechDZ - تسجيل</title>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; }
@@ -12,10 +12,9 @@
     </style>
 </head>
 <body>
-    
 
 <form id="signupForm">
-    <h2>إنشاء حساب جديد</h2>
+    <h2> إنشاء حساب جديد </h2>
     <input type="text" id="fullName" placeholder="الاسم الكامل" required>
     <input type="email" id="email" placeholder="البريد الإلكتروني" required>
     <input type="password" id="password" placeholder="كلمة المرور" required>
@@ -27,17 +26,25 @@
 
     function sendOTP() {
         const userEmail = document.getElementById('email').value;
-        if (!userEmail) { alert("يرجى إدخال البريد الإلكتروني"); return; }
-        
+        if (!userEmail) {
+            alert("يرجى إدخال البريد الإلكتروني");
+            return;
+        }
+
         const generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
         localStorage.setItem("myGeneratedOTP", generatedOTP);
         
         document.getElementById('sendBtn').innerText = "جاري الإرسال...";
-        
+
         emailjs.send("service_me5o2lp", "template_f2zzbb6", {
             email: userEmail,
             passcode: generatedOTP
         }).then(() => {
+            // كود الحفظ المحدث ليضيف الإيميل للقائمة
+            let users = JSON.parse(localStorage.getItem('registeredUsers') || "[]");
+            users.push(userEmail);
+            localStorage.setItem('registeredUsers', JSON.stringify(users));
+            
             alert("تم إرسال الكود! سيتم تحويلك لصفحة التحقق.");
             window.location.href = "verify.html";
         }, (err) => {
