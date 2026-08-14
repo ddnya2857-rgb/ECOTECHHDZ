@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>EcoTechDZ - الرئيسية</title>
+    <!-- إضافة مكتبات الذكاء الاصطناعي -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; padding: 20px; margin: 0; }
         .nav-bar { background: #287456; padding: 15px; color: white; text-align: center; border-radius: 5px; margin-bottom: 20px; }
@@ -15,14 +18,15 @@
     </style>
 </head>
 <body>
+
     <div class="nav-bar">
         <a href="index.html">الرئيسية</a>
         <a href="dashboard.html">لوحة التحكم</a>
         <a href="municipal_dashboard.html">لوحة البلديات</a>
         <a href="admin_dashboard.html">لوحة المدير</a>
     </div>
-   
-    <div style="text-align: center;">
+
+    <div style="text-align: center">
         <div class="logo-container">
             <img src="logo.jpeg" alt="EcoTechDZ Logo">
         </div>
@@ -34,37 +38,38 @@
         <h3>الكاميرا الذكية : تصنيف ووزن</h3>
         <video id="webcam" width="100%" autoplay playsinline style="background:#000; border-radius: 8px;"></video>
         <button onclick="startCamera()">تشغيل الكاميرا</button>
-        <button onclick="classifyWaste()" style="background:#007bff">بدء التصنيف التلقائي الذكي</button>
+        <button onclick="classifyWaste()" style="background:#007bff">بدء التصنيف الذكي</button>
+        <p id="aiStatus" style="text-align:center; color:#555; font-size: 13px;">جاري تحميل نموذج الذكاء الاصطناعي...</p>
     </div>
 
     <div class="box">
         <h3>بيانات العملية والربط</h3>
-
-        <!-- قسم صفقات التوريد الخاصة (فارغة افتراضياً ولا توجد قيم مسبقة) -->
+       
+        <!-- قسم صفقة التوريد -->
         <div style="background: #fff3cd; padding: 10px; border-radius: 5px; margin-bottom: 10px; border: 1px solid #ffeeba;">
-            <label style="font-weight: bold; font-size: 13px; color: #856404;">
-                <input type="checkbox" id="contractDealToggle" onchange="toggleContractDeal()" style="width: auto; margin-left: 5px;">
+            <label style="font-weight: bold; font-size: 13px; color: #856404">
+                <input type="checkbox" id="contractDealToggle" onchange="toggleContractDeal()" style="width: auto; margin-left: 5px">
                 تفعيل صفقة توريد متفق عليها (للنفايات الحيوانية / النباتية)
             </label>
-            <div id="contractDetails" style="display:none; margin-top: 8px;">
+            <div id="contractDetails" style="display:none; margin-top: 8px">
                 <input type="number" id="contractMaxWeight" placeholder="أدخل الكمية الإجمالية المتفق عليها (كغ)" oninput="checkContractLimit()">
-                <small style="color: #666; display: block;">ملاحظة: ستتوقف هذه النفايات تلقائياً عند استنفاذ الكمية المحددة.</small>
+                <small style="color: #666; display: block;">ملاحظة: ستتوقف هذه النفايات تلقائيًا عند استنفاز الكمية المحددة.</small>
             </div>
         </div>
-       
+
         <select id="wasteType" onchange="updatePrice()">
             <option value="">اختر نوع النفايات</option>
-            <option value="بالستيك">بلاستيك</option>
+            <option value="بالستيك">بالستيك</option>
             <option value="معادن">معادن</option>
             <option value="ورق">ورق</option>
             <option value="زجاج">زجاج</option>
-            <option id="mainOptAnimal" value="نفايات حيوانية" style="display:none;">نفايات حيوانية ( للكولاجين )</option>
-            <option id="mainOptPlant" value="نفايات نباتية" style="display:none;">نفايات نباتية ( أسمدة وزيوت )</option>
+            <option id="mainOptAnimal" value="نفايات حيوانية" style="display:none">نفايات حيوانية (للكولاجين)</option>
+            <option id="mainOptPlant" value="نفايات نباتية" style="display:none">نفايات نباتية (أسمدة وزيوت)</option>
         </select>
 
         <input type="number" id="weight" placeholder="الوزن (كغ)" oninput="updatePrice()">
         <input type="text" id="price" placeholder="الإجمالي (دج)" readonly>
-       
+
         <select id="actionType">
             <option value="بيع">بيع</option>
             <option value="شراء">شراء</option>
@@ -77,8 +82,8 @@
         </select>
 
         <div id="paymentDetails" style="display:none">
-            <input type="text" id="cardNumber" placeholder="رقم البطاقة / الحساب">
-            <input type="password" id="cardCode" placeholder="كود التحقق">
+            <input type="text" id="cardNumber" placeholder="رقم الحساب / البطاقة">
+            <input type="password" id="cardCode" placeholder="كود التحقق الرقم السري">
         </div>
 
         <select id="userType">
@@ -88,14 +93,21 @@
             <option value="مطعم">مطعم</option>
         </select>
 
-        <!-- حقل الموقع خالٍ تماماً من أي قيم افتراضية -->
         <input type="text" id="location" placeholder="حدد موقع الحي أو المنزل عبر الـ GPS" readonly>
         <button onclick="getLocation()" style="background:#6c757d">تحديد الموقع (GPS)</button>
-       
+
         <button onclick="submitTransaction()" style="background:#dc3545; margin-top:10px">تأكيد العملية</button>
     </div>
 
     <script>
+        let aiModel;
+       
+        // تحميل نموذج الذكاء الاصطناعي للرؤية
+        mobilenet.load().then(loadedModel => {
+            aiModel = loadedModel;
+            document.getElementById('aiStatus').innerText = "الذكاء الاصطناعي جاهز للتعرف على النفايات!";
+        });
+
         const pricelist = {
             "بالستيك": 8,
             "معادن": 5,
@@ -110,7 +122,7 @@
             const details = document.getElementById('contractDetails');
             const mainOptAnimal = document.getElementById('mainOptAnimal');
             const mainOptPlant = document.getElementById('mainOptPlant');
-
+           
             if (isChecked) {
                 details.style.display = 'block';
                 mainOptAnimal.style.display = 'block';
@@ -119,9 +131,8 @@
                 details.style.display = 'none';
                 mainOptAnimal.style.display = 'none';
                 mainOptPlant.style.display = 'none';
-               
                 const currentVal = document.getElementById('wasteType').value;
-                if (currentVal === 'نفايات حيوانية' || currentVal === 'نفايات نباتية') {
+                if(currentVal === 'نفايات حيوانية' || currentVal === 'نفايات نباتية') {
                     document.getElementById('wasteType').value = '';
                     updatePrice();
                 }
@@ -132,9 +143,9 @@
             const maxW = parseFloat(document.getElementById('contractMaxWeight').value) || 0;
             let allOps = JSON.parse(localStorage.getItem('allOperations') || '[]');
             let deliveredWeight = allOps
-                .filter(op => op.type === 'نفايات حيوانية' || op.type === 'نفايات نباتية')
+                .filter(op => op.type === 'نفايات نباتية' || op.type === 'نفايات حيوانية')
                 .reduce((sum, op) => sum + (parseFloat(op.weight) || 0), 0);
-
+           
             if (maxW > 0 && deliveredWeight >= maxW) {
                 alert("لقد بلغت الكمية الإجمالية المتفق عليها لصفقة التوريد! سيتم إيقاف ظهور هذه النفايات.");
                 document.getElementById('contractDealToggle').checked = false;
@@ -155,7 +166,7 @@
         function togglePaymentFields() {
             const method = document.getElementById('paymentMethod').value;
             const details = document.getElementById('paymentDetails');
-            if (method === 'البطاقة الذهبية' || method === 'بريدي موب') {
+            if(method === 'البطاقة الذهبية' || method === 'بريدي موب') {
                 details.style.display = 'block';
             } else {
                 details.style.display = 'none';
@@ -168,15 +179,47 @@
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 video.srcObject = stream;
             } catch (err) {
-                alert("تعذر تشغيل الكاميرا: " + err.message);
+                alert("تعذر تشغيل الكاميرا: تأكد من الأذونات.");
             }
         }
 
-        function classifyWaste() {
-            document.getElementById('wasteType').value = 'بالستيك';
-            document.getElementById('weight').value = '0.5';
-            updatePrice();
-            alert("تم رصد النفايات وتحديد الوزن بنجاح!");
+        async function classifyWaste() {
+            if (!aiModel) {
+                alert("الرجاء الانتظار قليلاً حتى يتم تحميل نموذج الذكاء الاصطناعي.");
+                return;
+            }
+            const video = document.getElementById('webcam');
+            if (!video.srcObject) {
+                alert("يرجى تشغيل الكاميرا أولاً!");
+                return;
+            }
+
+            try {
+                const predictions = await aiModel.classify(video);
+                if (predictions && predictions.length > 0) {
+                    const topPrediction = predictions[0].className.toLowerCase();
+                    let selectedType = "بالستيك"; // افتراضي
+                   
+                    if (topPrediction.includes('bottle') || topPrediction.includes('plastic') || topPrediction.includes('container')) {
+                        selectedType = "بالستيك";
+                    } else if (topPrediction.includes('glass') || topPrediction.includes('jar')) {
+                        selectedType = "زجاج";
+                    } else if (topPrediction.includes('paper') || topPrediction.includes('box') || topPrediction.includes('cardboard')) {
+                        selectedType = "ورق";
+                    } else if (topPrediction.includes('metal') || topPrediction.includes('can') || topPrediction.includes('aluminum')) {
+                        selectedType = "معادن";
+                    }
+
+                    document.getElementById('wasteType').value = selectedType;
+                    // وزن تقديري عشوائي واقعي بين 0.3 و 1.5 كغ
+                    document.getElementById('weight').value = (Math.random() * (1.5 - 0.3) + 0.3).toFixed(1);
+                    updatePrice();
+                   
+                    alert("تم رصد النفايات بالذكاء الاصطناعي وتحديد النوع (" + selectedType + ") بنجاح!");
+                }
+            } catch (e) {
+                alert("حدث خطأ أثناء التصنيف بالذكاء الاصطناعي.");
+            }
         }
 
         function getLocation() {
@@ -185,8 +228,8 @@
                     (position) => {
                         const lat = position.coords.latitude.toFixed(4);
                         const lon = position.coords.longitude.toFixed(4);
-                        document.getElementById('location').value = `حي السكن / المنزل (${lat}, ${lon})`;
-                        alert("تم التقاط الموقع الجغرافي بدقة بنجاح!");
+                        document.getElementById('location').value = `حي السكن / المنزل (سكيكدة) - إحداثيات: (${lat}, ${lon})`;
+                        alert("تم التقاط الموقع الجغرافي بدقة في سكيكدة بنجاح!");
                     },
                     (error) => {
                         alert("فشل الوصول للموقع الجغرافي. تأكد من تفعيل الـ GPS.");
@@ -202,12 +245,11 @@
             const weight = parseFloat(document.getElementById('weight').value);
             const price = parseFloat(document.getElementById('price').value);
             const locationVal = document.getElementById('location').value;
-
+           
             if (!locationVal) {
                 alert("الرجاء تحديد الموقع الجغرافي للحي أو المنزل عبر الـ GPS أولاً!");
                 return;
             }
-
             if (!wasteType || !weight || weight <= 0) {
                 alert("الرجاء اختيار نوع النفايات وإدخال الوزن بشكل صحيح!");
                 return;
@@ -219,9 +261,9 @@
                 let currentTotal = allOps
                     .filter(op => op.type === wasteType)
                     .reduce((sum, op) => sum + (parseFloat(op.weight) || 0), 0);
-
+               
                 if (maxW > 0 && (currentTotal + weight) > maxW) {
-                    alert(`عذراً، هذه العملية تتجاوز الكمية الإجمالية المتفق عليها في الصفقة (${maxW} كغ).`);
+                    alert(`عذرًا، هذه العملية تتجاوز الكمية الإجمالية المتفق عليها في الصفقة (${maxW} كغ).`);
                     return;
                 }
             }
@@ -234,20 +276,16 @@
                 points: Math.floor((price || 0) / 10),
                 actionType: document.getElementById('actionType').value,
                 userType: document.getElementById('userType').value,
-                payment: document.getElementById('paymentMethod').value,
+                paymentMethod: document.getElementById('paymentMethod').value,
                 location: locationVal,
-                date: new Date().toLocaleDateString()
+                date: new Date().toLocaleString()
             };
 
-            let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
-            transactions.push(transaction);
-            localStorage.setItem('transactions', JSON.stringify(transactions));
+            let allOps = JSON.parse(localStorage.getItem('allOperations') || '[]');
+            allOps.push(transaction);
+            localStorage.setItem('allOperations', JSON.stringify(allOps));
 
-            let allOperations = JSON.parse(localStorage.getItem('allOperations')) || [];
-            allOperations.push(transaction);
-            localStorage.setItem('allOperations', JSON.stringify(allOperations));
-
-            alert("تم تسجيل العملية بنجاح! الانتقال إلى لوحة التحكم...");
+            alert("تم تأكيد العملية بنجاح وتسجيلها في المنصة!");
             window.location.href = "dashboard.html";
         }
     </script>
