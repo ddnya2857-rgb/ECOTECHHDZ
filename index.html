@@ -4,133 +4,252 @@
     <meta charset="UTF-8">
     <title>EcoTechDZ - الرئيسية</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; padding: 20px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; padding: 20px; margin: 0; }
         .nav-bar { background: #287456; padding: 15px; color: white; text-align: center; border-radius: 5px; margin-bottom: 20px; }
+        .nav-bar a { color: white; margin: 0 5px; text-decoration: none; font-weight: bold; }
         .box { background: white; padding: 20px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         input, select { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { background: #28a745; color: white; padding: 12px; border: none; width: 100%; border-radius: 5px; cursor: pointer; margin-top: 5px; }
+        button { background: #28a745; color: white; padding: 12px; border: none; width: 100%; border-radius: 5px; cursor: pointer; margin-top: 5px; font-weight: bold; }
+        .logo-container { text-align: center; margin-bottom: 15px; }
+        .logo-container img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
-
-<nav class="nav-bar">
-    <a href="signup.html" style="color: white; margin: 0 5px;">التسجيل</a>
-    <a href="verify.html" style="color: white; margin: 0 5px;">التحقق</a>
-    <a href="index.html" style="color: white; margin: 0 5px;">الرئيسية</a>
-    <a href="dashboard.html" style="color: white; margin: 0 5px;">لوحة التحكم</a>
-</nav>
-
-<div style="text-align: center;">
-    <h1>EcoTechDZ - الاقتصاد الدائري في سكيكدة</h1>
-    <h3>نحو جزائر خضراء</h3>
-</div>
-
-<div class="box">
-    <h3>الكاميرا الذكية: تصنيف ووزن</h3>
-    <video id="webcam" width="100%" autoplay playsinline style="background:#000;"></video>
-    <button onclick="startCamera()">تشغيل الكاميرا</button>
-    <button onclick="classifyWaste()" style="background:#007bff;">بدء التصنيف التلقائي</button>
-</div>
-
-<div class="box">
-    <h3>بيانات العملية والربط</h3>
-    <select id="wasteType" onchange="updatePrice()">
-        <option value="">اختر نوع النفايات</option>
-        <option value="بلاستيك">بلاستيك</option>
-        <option value="معادن">معادن</option>
-        <option value="ورق">ورق</option>
-        <option value="زجاج">زجاج</option>
-    </select>
-    <input type="number" id="weight" placeholder="الوزن (كغ)" oninput="updatePrice()">
-    <input type="text" id="price" placeholder="المبلغ" readonly>
-    <select id="actionType">
-        <option value="بيع">بيع</option>
-        <option value="شراء">شراء</option>
-    </select>
-    <select id="paymentMethod" onchange="togglePaymentFields()">
-        <option value="عند التسليم">عند التسليم</option>
-        <option value="بريدي موب">بريدي موب</option>
-        <option value="البطاقة الذهبية">البطاقة الذهبية</option>
-    </select>
-    <div id="paymentDetails" style="display:none;">
-        <input type="text" id="cardNumber" placeholder="رقم البطاقة / الحساب">
-        <input type="password" id="cardCode" placeholder="كود التحقق">
+    <div class="nav-bar">
+        <a href="index.html">الرئيسية</a>
+        <a href="dashboard.html">لوحة التحكم</a>
+        <a href="municipal_dashboard.html">لوحة البلديات</a>
+        <a href="admin_dashboard.html">لوحة المدير</a>
     </div>
-    <select id="userType">
-        <option value="فرد">فرد</option>
-        <option value="مؤسسة عمومية أو خاصة">مؤسسة عمومية أو خاصة</option>
-        <option value="فندق">فندق</option>
-        <option value="مطعم">مطعم</option>
-        <option value="محل تجاري">محل تجاري</option>
-        <option value="جامع نفايات">جامع نفايات</option>
-        <option value="ناقل صاحب شاحنة نقل">ناقل صاحب شاحنة نقل</option>
-        <option value="مركز إعادة تدوير">مركز إعادة تدوير</option>
-        <option value="ورشة صناعية">ورشة صناعية</option>
-    </select>
-    <input type="text" id="location" value="سكيكدة" readonly>
-    <button onclick="getLocation()" style="background:#6c757d;">تحديد الموقع (GPS)</button>
-    <button onclick="submitTransaction()" style="background:#dc3545; margin-top: 10px;">تأكيد العملية</button>
-</div>
+   
+    <div style="text-align: center;">
+        <div class="logo-container">
+            <img src="logo.jpeg" alt="EcoTechDZ Logo">
+        </div>
+        <h1>EcoTechDZ</h1>
+        <h3>الاقتصاد الدائري في سكيكدة - نحو جزائر خضراء</h3>
+    </div>
 
-<script>
-    const pricelist = {"بلاستيك": 5, "معادن": 20, "ورق": 10, "زجاج": 8};
+    <div class="box">
+        <h3>الكاميرا الذكية : تصنيف ووزن</h3>
+        <video id="webcam" width="100%" autoplay playsinline style="background:#000; border-radius: 8px;"></video>
+        <button onclick="startCamera()">تشغيل الكاميرا</button>
+        <button onclick="classifyWaste()" style="background:#007bff">بدء التصنيف التلقائي الذكي</button>
+    </div>
 
-    function updatePrice() {
-        const type = document.getElementById('wasteType').value;
-        const weight = document.getElementById('weight').value;
-        if(pricelist[type] && weight) {
-            document.getElementById('price').value = pricelist[type] * weight;
-        }
-    }
+    <div class="box">
+        <h3>بيانات العملية والربط</h3>
 
-    function togglePaymentFields() {
-        const method = document.getElementById('paymentMethod').value;
-        document.getElementById('paymentDetails').style.display = (method === "البطاقة الذهبية") ? "block" : "none";
-    }
-
-    async function startCamera() {
-        const video = document.getElementById('webcam');
-        video.srcObject = await navigator.mediaDevices.getUserMedia({ video: true });
-    }
-
-    function classifyWaste() {
-        document.getElementById('wasteType').value = "بلاستيك";
-        document.getElementById('weight').value = "0.5";
-        updatePrice();
-        alert("تم رصد النفايات وتحديد الوزن!");
-    }
-
-    function getLocation() {
-        alert("تم تحديد موقعك في سكيكدة والربط مع أقرب المشترين / البائعين.");
-    }
-
-    function submitTransaction() {
-        const price = parseFloat(document.getElementById('price').value) || 0;
-        const action = document.getElementById('actionType').value;
-        const user = document.getElementById('userType').value;
+        <!-- قسم صفقات التوريد الخاصة (فارغة افتراضياً ولا توجد قيم مسبقة) -->
+        <div style="background: #fff3cd; padding: 10px; border-radius: 5px; margin-bottom: 10px; border: 1px solid #ffeeba;">
+            <label style="font-weight: bold; font-size: 13px; color: #856404;">
+                <input type="checkbox" id="contractDealToggle" onchange="toggleContractDeal()" style="width: auto; margin-left: 5px;">
+                تفعيل صفقة توريد متفق عليها (للنفايات الحيوانية / النباتية)
+            </label>
+            <div id="contractDetails" style="display:none; margin-top: 8px;">
+                <input type="number" id="contractMaxWeight" placeholder="أدخل الكمية الإجمالية المتفق عليها (كغ)" oninput="checkContractLimit()">
+                <small style="color: #666; display: block;">ملاحظة: ستتوقف هذه النفايات تلقائياً عند استنفاذ الكمية المحددة.</small>
+            </div>
+        </div>
        
-        // حساب النقاط
-        const points = (action === "بيع" && user === "فرد") ? (price * 0.1) : 0;
+        <select id="wasteType" onchange="updatePrice()">
+            <option value="">اختر نوع النفايات</option>
+            <option value="بالستيك">بلاستيك</option>
+            <option value="معادن">معادن</option>
+            <option value="ورق">ورق</option>
+            <option value="زجاج">زجاج</option>
+            <option id="mainOptAnimal" value="نفايات حيوانية" style="display:none;">نفايات حيوانية ( للكولاجين )</option>
+            <option id="mainOptPlant" value="نفايات نباتية" style="display:none;">نفايات نباتية ( أسمدة وزيوت )</option>
+        </select>
 
-        const transaction = {
-            email: localStorage.getItem("loggedInUserEmail") || "غير مسجل",
-            type: document.getElementById('wasteType').value,
-            wasteAmount: document.getElementById('weight').value + " كغ",
-            price: price,
-            points: points,
-            actionType: action,
-            date: new Date().toLocaleDateString()
+        <input type="number" id="weight" placeholder="الوزن (كغ)" oninput="updatePrice()">
+        <input type="text" id="price" placeholder="الإجمالي (دج)" readonly>
+       
+        <select id="actionType">
+            <option value="بيع">بيع</option>
+            <option value="شراء">شراء</option>
+        </select>
+
+        <select id="paymentMethod" onchange="togglePaymentFields()">
+            <option value="عند التسليم">عند التسليم</option>
+            <option value="بريدي موب">بريدي موب</option>
+            <option value="البطاقة الذهبية">البطاقة الذهبية</option>
+        </select>
+
+        <div id="paymentDetails" style="display:none">
+            <input type="text" id="cardNumber" placeholder="رقم البطاقة / الحساب">
+            <input type="password" id="cardCode" placeholder="كود التحقق">
+        </div>
+
+        <select id="userType">
+            <option value="فرد">فرد</option>
+            <option value="مؤسسة">مؤسسة عمومية أو خاصة</option>
+            <option value="فندق">فندق</option>
+            <option value="مطعم">مطعم</option>
+        </select>
+
+        <!-- حقل الموقع خالٍ تماماً من أي قيم افتراضية -->
+        <input type="text" id="location" placeholder="حدد موقع الحي أو المنزل عبر الـ GPS" readonly>
+        <button onclick="getLocation()" style="background:#6c757d">تحديد الموقع (GPS)</button>
+       
+        <button onclick="submitTransaction()" style="background:#dc3545; margin-top:10px">تأكيد العملية</button>
+    </div>
+
+    <script>
+        const pricelist = {
+            "بالستيك": 8,
+            "معادن": 5,
+            "ورق": 20,
+            "زجاج": 10,
+            "نفايات حيوانية": 50,
+            "نفايات نباتية": 30
         };
 
-        // التخزين في operationsHistory المخصص للوحة المدير
-        let history = JSON.parse(localStorage.getItem('operationsHistory') || "[]");
-        history.push(transaction);
-        localStorage.setItem('operationsHistory', JSON.stringify(history));
+        function toggleContractDeal() {
+            const isChecked = document.getElementById('contractDealToggle').checked;
+            const details = document.getElementById('contractDetails');
+            const mainOptAnimal = document.getElementById('mainOptAnimal');
+            const mainOptPlant = document.getElementById('mainOptPlant');
 
-        alert("تم تسجيل العملية بنجاح في سجل العمليات!");
-        window.location.href = 'dashboard.html';
-    }
-</script>
+            if (isChecked) {
+                details.style.display = 'block';
+                mainOptAnimal.style.display = 'block';
+                mainOptPlant.style.display = 'block';
+            } else {
+                details.style.display = 'none';
+                mainOptAnimal.style.display = 'none';
+                mainOptPlant.style.display = 'none';
+               
+                const currentVal = document.getElementById('wasteType').value;
+                if (currentVal === 'نفايات حيوانية' || currentVal === 'نفايات نباتية') {
+                    document.getElementById('wasteType').value = '';
+                    updatePrice();
+                }
+            }
+        }
 
+        function checkContractLimit() {
+            const maxW = parseFloat(document.getElementById('contractMaxWeight').value) || 0;
+            let allOps = JSON.parse(localStorage.getItem('allOperations') || '[]');
+            let deliveredWeight = allOps
+                .filter(op => op.type === 'نفايات حيوانية' || op.type === 'نفايات نباتية')
+                .reduce((sum, op) => sum + (parseFloat(op.weight) || 0), 0);
+
+            if (maxW > 0 && deliveredWeight >= maxW) {
+                alert("لقد بلغت الكمية الإجمالية المتفق عليها لصفقة التوريد! سيتم إيقاف ظهور هذه النفايات.");
+                document.getElementById('contractDealToggle').checked = false;
+                toggleContractDeal();
+            }
+        }
+
+        function updatePrice() {
+            const type = document.getElementById('wasteType').value;
+            const weight = parseFloat(document.getElementById('weight').value) || 0;
+            if (pricelist[type] && weight > 0) {
+                document.getElementById('price').value = pricelist[type] * weight;
+            } else {
+                document.getElementById('price').value = '';
+            }
+        }
+
+        function togglePaymentFields() {
+            const method = document.getElementById('paymentMethod').value;
+            const details = document.getElementById('paymentDetails');
+            if (method === 'البطاقة الذهبية' || method === 'بريدي موب') {
+                details.style.display = 'block';
+            } else {
+                details.style.display = 'none';
+            }
+        }
+
+        async function startCamera() {
+            try {
+                const video = document.getElementById('webcam');
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+            } catch (err) {
+                alert("تعذر تشغيل الكاميرا: " + err.message);
+            }
+        }
+
+        function classifyWaste() {
+            document.getElementById('wasteType').value = 'بالستيك';
+            document.getElementById('weight').value = '0.5';
+            updatePrice();
+            alert("تم رصد النفايات وتحديد الوزن بنجاح!");
+        }
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude.toFixed(4);
+                        const lon = position.coords.longitude.toFixed(4);
+                        document.getElementById('location').value = `حي السكن / المنزل (${lat}, ${lon})`;
+                        alert("تم التقاط الموقع الجغرافي بدقة بنجاح!");
+                    },
+                    (error) => {
+                        alert("فشل الوصول للموقع الجغرافي. تأكد من تفعيل الـ GPS.");
+                    }
+                );
+            } else {
+                alert("المتصفح لا يدعم تحديد الموقع.");
+            }
+        }
+
+        function submitTransaction() {
+            const wasteType = document.getElementById('wasteType').value;
+            const weight = parseFloat(document.getElementById('weight').value);
+            const price = parseFloat(document.getElementById('price').value);
+            const locationVal = document.getElementById('location').value;
+
+            if (!locationVal) {
+                alert("الرجاء تحديد الموقع الجغرافي للحي أو المنزل عبر الـ GPS أولاً!");
+                return;
+            }
+
+            if (!wasteType || !weight || weight <= 0) {
+                alert("الرجاء اختيار نوع النفايات وإدخال الوزن بشكل صحيح!");
+                return;
+            }
+
+            if (document.getElementById('contractDealToggle').checked) {
+                const maxW = parseFloat(document.getElementById('contractMaxWeight').value) || 0;
+                let allOps = JSON.parse(localStorage.getItem('allOperations') || '[]');
+                let currentTotal = allOps
+                    .filter(op => op.type === wasteType)
+                    .reduce((sum, op) => sum + (parseFloat(op.weight) || 0), 0);
+
+                if (maxW > 0 && (currentTotal + weight) > maxW) {
+                    alert(`عذراً، هذه العملية تتجاوز الكمية الإجمالية المتفق عليها في الصفقة (${maxW} كغ).`);
+                    return;
+                }
+            }
+
+            const transaction = {
+                email: localStorage.getItem("loggedInUserEmail") || "مستخدم غير مسجل",
+                type: wasteType,
+                weight: weight,
+                price: price || 0,
+                points: Math.floor((price || 0) / 10),
+                actionType: document.getElementById('actionType').value,
+                userType: document.getElementById('userType').value,
+                payment: document.getElementById('paymentMethod').value,
+                location: locationVal,
+                date: new Date().toLocaleDateString()
+            };
+
+            let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+            transactions.push(transaction);
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+
+            let allOperations = JSON.parse(localStorage.getItem('allOperations')) || [];
+            allOperations.push(transaction);
+            localStorage.setItem('allOperations', JSON.stringify(allOperations));
+
+            alert("تم تسجيل العملية بنجاح! الانتقال إلى لوحة التحكم...");
+            window.location.href = "dashboard.html";
+        }
+    </script>
 </body>
 </html> 

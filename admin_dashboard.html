@@ -2,55 +2,102 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>EcoTechDZ - لوحة تحكم المدير</title>
+    <title>لوحة تحكم المدير - EcoTechDZ</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f7f6; padding: 20px; }
-        h2 { text-align: center; color: #28a745; margin-bottom: 30px; }
-        .container { max-width: 1000px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
-        th { background-color: #28a745; color: white; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; padding: 20px; color: #333; }
+        .nav-bar { background: #287456; padding: 15px; color: white; text-align: center; border-radius: 8px; margin-bottom: 20px; }
+        .nav-bar a { color: white; margin: 0 10px; text-decoration: none; font-weight: bold; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 25px; }
+        h3 { color: #287456; border-bottom: 2px solid #e9ecef; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; border: 1px solid #dee2e6; text-align: center; }
+        th { background-color: #f8f9fa; color: #287456; font-weight: bold; }
     </style>
 </head>
 <body>
+    <nav class="nav-bar">
+        <a href="index.html">الرئيسية</a>
+        <a href="dashboard.html">لوحة التحكم</a>
+        <a href="municipal_dashboard.html">لوحة البلديات</a>
+        <a href="admin_dashboard.html">لوحة المدير</a>
+    </nav>
 
-<div class="container">
-    <h2>لوحة تحكم EcoTechDZ</h2>
+    <!-- قسم العقود والاتفاقيات (خالٍ تماماً من أي بيانات افتراضية) -->
+    <div class="card">
+        <h3>إدارة العقود والاتفاقيات (توريد وتصريف)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>المؤسسة / المستثمر</th>
+                    <th>نوع النفايات</th>
+                    <th>نوع العقد</th>
+                    <th>قيمة العقد/الشهر</th>
+                    <th>الحالة</th>
+                </tr>
+            </thead>
+            <tbody id="contractsTable"></tbody>
+        </table>
+        <p style="font-size: 12px; color: #777; margin-top: 10px;">يشمل عقود توريد المواد الخام وعقود تصريف نفايات المؤسسات.</p>
+    </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>البريد الإلكتروني</th>
-                <th>نوع العملية</th>
-                <th>كمية النفايات</th>
-                <th>النقاط المكتسبة</th>
-                <th>التاريخ</th>
-            </tr>
-        </thead>
-        <tbody id="adminTableBody"></tbody>
-    </table>
-</div>
+    <!-- سجل العمليات العام -->
+    <div class="card">
+        <h3>سجل العمليات العام</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>المستخدم</th>
+                    <th>نوع المستخدم</th>
+                    <th>النوع</th>
+                    <th>الوزن</th>
+                    <th>نوع العملية</th>
+                    <th>الموقع (GPS)</th>
+                </tr>
+            </thead>
+            <tbody id="adminTableBody"></tbody>
+        </table>
+    </div>
 
-<script>
-    // جلب العمليات المسجلة من localStorage تحت اسم operationsHistory
-    const history = JSON.parse(localStorage.getItem('operationsHistory') || "[]");
-    const tableBody = document.getElementById("adminTableBody");
+    <script>
+        const history = JSON.parse(localStorage.getItem('allOperations') || "[]");
+        const tbody = document.getElementById('adminTableBody');
+        const contractsTable = document.getElementById('contractsTable');
+       
+        // جلب سجل العمليات العام
+        tbody.innerHTML = "";
+        if (history.length === 0) {
+            tbody.innerHTML = "<tr><td colspan='6'>لا توجد عمليات مسجلة حالياً</td></tr>";
+        } else {
+            history.forEach(item => {
+                let row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${item.email}</td>
+                    <td>${item.userType}</td>
+                    <td style="font-weight:bold;">${item.type}</td>
+                    <td>${item.weight} كغ</td>
+                    <td>${item.actionType}</td>
+                    <td style="font-size: 11px;">${item.location || 'غير محدد'}</td>
+                `;
+            });
+        }
 
-    if (history.length > 0) {
-        history.forEach(op => {
-            const row = `<tr>
-                <td>${op.email}</td>
-                <td>${op.type}</td>
-                <td>${op.wasteAmount}</td>
-                <td>${op.points}</td>
-                <td>${op.date}</td>
-            </tr>`;
-            tableBody.innerHTML += row;
-        });
-    } else {
-        tableBody.innerHTML = "<tr><td colspan='5'>لا توجد عمليات مسجلة حالياً في EcoTechDZ.</td></tr>";
-    }
-</script>
-
+        // جدول العقود (يعتمد كلياً على التخزين المحلي بدون أي قيم افتراضية مسبقة)
+        const contracts = JSON.parse(localStorage.getItem('contracts') || "[]");
+        contractsTable.innerHTML = "";
+        if (contracts.length === 0) {
+            contractsTable.innerHTML = "<tr><td colspan='5'>لا توجد عقود مسجلة حالياً</td></tr>";
+        } else {
+            contracts.forEach(contract => {
+                let row = contractsTable.insertRow();
+                row.innerHTML = `
+                    <td>${contract.company || '-'}</td>
+                    <td>${contract.type || '-'}</td>
+                    <td>${contract.contractType || '-'}</td>
+                    <td>${contract.value || 0} دج</td>
+                    <td><span style="color: green; font-weight: bold;">${contract.status || 'ساري'}</span></td>
+                `;
+            });
+        }
+    </script>
 </body>
 </html> 

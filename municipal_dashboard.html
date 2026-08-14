@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>لوحة تحكم البلديات - EcoTechDZ</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f6f9; padding: 20px; margin: 0; color: #333; }
+        .nav-bar { background: #287456; padding: 15px; color: white; text-align: center; border-radius: 8px; margin-bottom: 20px; }
+        .nav-bar a { color: white; margin: 0 10px; text-decoration: none; font-weight: bold; }
+        .header-title { text-align: center; margin-bottom: 30px; }
+        .header-title h2 { color: #287456; margin-bottom: 5px; }
+        .header-title p { color: #666; font-size: 14px; max-width: 700px; margin: 0 auto; line-height: 1.6; }
+        .stats-container { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
+        .stat-card { background: white; flex: 1; min-width: 200px; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center; border-top: 4px solid #287456; }
+        .stat-card h4 { margin: 0 0 10px 0; color: #555; font-size: 15px; }
+        .stat-card span { font-size: 22px; font-weight: bold; color: #287456; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .card h3 { margin-top: 0; color: #287456; border-bottom: 2px solid #e9ecef; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: center; font-size: 14px; }
+        th { background-color: #f8f9fa; color: #287456; }
+        .recommendation-box { background: #e8f5e9; border-right: 5px solid #28a745; padding: 15px; border-radius: 5px; margin-top: 15px; }
+    </style>
+</head>
+<body>
+    <nav class="nav-bar">
+        <a href="index.html">الرئيسية</a>
+        <a href="dashboard.html">لوحة التحكم</a>
+        <a href="municipal_dashboard.html">لوحة البلديات</a>
+        <a href="admin_dashboard.html">لوحة المدير</a>
+    </nav>
+
+    <div class="header-title">
+        <h2>لوحة تحكم البلديات (Municipal Dashboard)</h2>
+        <p>واجهة إدارية مخصصة للبلديات ومصالح البيئة، تعرض بيانات مجمعة (بدون بيانات شخصية) عن حجم وأنواع النفايات لدعم تخطيط مسارات الجمع العمومي حسب الحي، ومعدلات الفرز، ونقط التجمع الأكثر نشاطًا[span_2](start_span)[span_2](end_span).</p>
+    </div>
+
+    <div class="stats-container">
+        <div class="stat-card">
+            <h4>إجمالي النفايات المجمعة</h4>
+            <span id="totalWeight">0</span> كغ[span_3](start_span)[span_3](end_span)
+        </div>
+        <div class="stat-card">
+            <h4>عدد العمليات المسجلة</h4>
+            <span id="totalOperations">0</span> عملية[span_4](start_span)[span_4](end_span)
+        </div>
+        <div class="stat-card">
+            <h4>الأحياء والمواقع الأكثر نشاطًا</h4>
+            <span id="activeZone">قيد التحليل...</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>تحليل أنواع النفايات وحجمها</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>نوع النفايات</th>
+                    <th>إجمالي الوزن المجمع (كغ)[span_5](start_span)[span_5](end_span)</th>
+                    <th>نسبة المساهمة[span_6](start_span)[span_6](end_span)</th>
+                    <th>الحالة التشغيلية[span_7](start_span)[span_7](end_span)</th>
+                </tr>
+            </thead>
+            <tbody id="municipalTableBody"></tbody>
+        </table>
+       
+        <div class="recommendation-box">
+            <h4>توجيه مسارات الجمع العمومي</h4>
+            <p>بناءً على الكثافة الحالية، يُنصح بتوجيه شاحنات الجمع العامة نحو نقاط التجمع في قطاع وسط المدينة وضرورة إطلاق حملات توعوية في الأحياء ذات معدلات الفرز المنخفضة[span_8](start_span)[span_8](end_span).</p>
+        </div>
+    </div>
+
+    <!-- قسم تفاصيل مواقع الـ GPS المرصودة للأحياء والمنازل -->
+    <div class="card">
+        <h3>سجل المواقع والأحياء المرصودة (GPS)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>الموقع / الحي / المنزل (GPS)</th>
+                    <th>إجمالي النفايات المجمعة من الموقع</th>
+                    <th>عدد العمليات بالمنطقة</th>
+                </tr>
+            </thead>
+            <tbody id="locationsTableBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        const allHistory = JSON.parse(localStorage.getItem('allOperations') || "[]");
+        let totalWeight = 0;
+        let typeTotals = { "بالستيك": 0, "معادن": 0, "ورق": 0, "زجاج": 0, "نفايات حيوانية": 0, "نفايات نباتية": 0, "نفايات صناعية": 0 };
+        let locationCounts = {};
+
+        allHistory.forEach(item => {
+            let w = parseFloat(item.weight) || 0;
+            totalWeight += w;
+
+            if (typeTotals[item.type] !== undefined) {
+                typeTotals[item.type] += w;
+            } else if (item.type) {
+                typeTotals[item.type] = w;
+            }
+
+            let gpsLocation = item.location || "نطاق عام - سكيكدة";
+            if (!locationCounts[gpsLocation]) {
+                locationCounts[gpsLocation] = { weight: 0, count: 0 };
+            }
+            locationCounts[gpsLocation].weight += w;
+            locationCounts[gpsLocation].count += 1;
+        });
+
+        document.getElementById('totalWeight').innerText = totalWeight;
+        document.getElementById('totalOperations').innerText = allHistory.length;
+
+        let activeZone = "لا توجد بيانات كافية بعد";
+        let maxW = 0;
+        for (let [zone, data] of Object.entries(locationCounts)) {
+            if (data.weight > maxW) {
+                maxW = data.weight;
+                activeZone = zone;
+            }
+        }
+        document.getElementById('activeZone').innerText = activeZone;
+
+        // تعبئة جدول أنواع النفايات
+        const tbody = document.getElementById('municipalTableBody');
+        tbody.innerHTML = "";
+        for (let [type, weight] of Object.entries(typeTotals)) {
+            let percentage = totalWeight > 0 ? ((weight / totalWeight) * 100).toFixed(1) : 0;
+            let row = tbody.insertRow();
+            row.innerHTML = `
+                <td>${type}</td>
+                <td>${weight} كغ</td>
+                <td>${percentage}%</td>
+                <td><span style="color: #28a745; font-weight: bold;">نشط (بالـ GPS مرصود)[span_9](start_span)[span_9](end_span)</span></td>
+            `;
+        }
+
+        // تعبئة جدول المواقع والأحياء المرصودة
+        const locationsBody = document.getElementById('locationsTableBody');
+        locationsBody.innerHTML = "";
+        if (Object.keys(locationCounts).length === 0) {
+            locationsBody.innerHTML = `<tr><td colspan="3">لا توجد مواقع مسجلة حتى الآن</td></tr>`;
+        } else {
+            for (let [zone, data] of Object.entries(locationCounts)) {
+                let row = locationsBody.insertRow();
+                row.innerHTML = `
+                    <td style="font-weight: bold; color: #287456;">${zone}</td>
+                    <td>${data.weight} كغ</td>
+                    <td>${data.count} عملية</td>
+                `;
+            }
+        }
+    </script>
+</body>
+</html> 

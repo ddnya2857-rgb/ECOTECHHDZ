@@ -29,15 +29,32 @@
     </div>
 
     <script>
-        function verifyCode() {
-            const enteredOTP = document.getElementById('otpInput').value;
-            const savedOTP = localStorage.getItem("myGeneratedOTP");
-            if(enteredOTP === savedOTP) {
-                alert("تم التحقق بنجاح!");
-                localStorage.setItem("userEmail", "ddnya2857@gmail.com");
-                window.location.href = "index.html";
-            } else { alert("الكود غير صحيح"); }
+        async function verifyCode() {
+    const enteredOTP = document.getElementById('otpInput').value;
+    const savedOTP = localStorage.getItem("myGeneratedOTP");
+    const userEmail = localStorage.getItem("userEmail");
+   
+    if(enteredOTP === savedOTP) {
+        alert("تم التحقق بنجاح!");
+        localStorage.setItem("loggedInUserEmail", userEmail);
+
+        // إرسال المستخدم الجديد إلى خادم Node.js لتخزينه في قاعدة بيانات MongoDB Atlas
+        try {
+            await fetch('/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: userEmail.split('@')[0], email: userEmail })
+            });
+        } catch (e) {
+            console.log("خطأ في الحفظ السحابي للمستخدم");
         }
+
+        window.location.href = "index.html";
+    } else {
+        alert("الكود غير صحيح");
+    }
+} 
+
     </script>
 </body>
 </html> 

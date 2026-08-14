@@ -4,25 +4,25 @@
     <meta charset="UTF-8">
     <title>EcoTechDZ - لوحة التحكم</title>
     <style>
-        :root { --green: #006233; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; padding: 20px; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f4f4; padding: 20px; }
         .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-top: 20px; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: center; }
-        th { background-color: #f8f9fa; color: var(--green); }
+        th { background-color: #f8f9fa; color: #287456; }
     </style>
 </head>
 <body>
-
     <nav style="background: #287456; padding: 15px; color: white; text-align: center; border-radius: 10px;">
-        <a href="index.html" style="color: white; margin: 0 10px;">الرئيسية</a>
-        <a href="dashboard.html" style="color: white; margin: 0 10px;">لوحة التحكم</a>
+        <a href="index.html" style="color: white; margin: 0 10px; text-decoration: none;">الرئيسية</a>
+        <a href="dashboard.html" style="color: white; margin: 0 10px; text-decoration: none;">لوحة التحكم</a>
+        <a href="municipal_dashboard.html" style="color: white; margin: 0 10px; text-decoration: none;">لوحة البلديات</a>
+        <a href="admin_dashboard.html" style="color: white; margin: 0 10px; text-decoration: none;">لوحة المدير</a>
     </nav>
 
     <div class="card">
         <h3>رصيدك البيئي التراكمي</h3>
-        <div id="user-points" style="font-size: 40px; color: var(--green); font-weight: bold;">0</div>
-        <p>نقطة مكتسبة (للأفراد عند عمليات البيع فقط)</p>
+        <div id="user-points" style="font-size: 40px; color: #287456; font-weight: bold;">0</div>
+        <p>نقطة مكتسبة للأفراد عند عمليات البيع فقط</p>
     </div>
 
     <div class="card">
@@ -44,41 +44,43 @@
 
     <script>
         function loadOperations() {
-            // سحب كافة العمليات من التخزين المحلي
-            const history = JSON.parse(localStorage.getItem('allOperations') || "[]");
+            const currentUserEmail = localStorage.getItem("loggedInUserEmail");
             const tbody = document.getElementById('historyBody');
             let totalPoints = 0;
+
+            const allHistory = JSON.parse(localStorage.getItem('allOperations')) || [];
+           
+            if (allHistory.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6">لا توجد عمليات مسجلة لك حتى الآن</td></tr>`;
+                document.getElementById('user-points').innerText = "0";
+                return;
+            }
+
+            // تصفية العمليات الخاصة بالمستخدم الحالي أو عرض الكل حسب الحاجة
+            const userHistory = currentUserEmail ? allHistory.filter(item => item.email === currentUserEmail) : allHistory;
            
             tbody.innerHTML = "";
-           
-            history.forEach(item => {
+            if (userHistory.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6">لا توجد عمليات مسجلة لك حتى الآن</td></tr>`;
+                document.getElementById('user-points').innerText = "0";
+                return;
+            }
+
+            userHistory.forEach(item => {
                 let row = tbody.insertRow();
+                let points = (item.userType === 'فرد' && item.actionType === 'بيع') ? (item.points || 0) : 0;
                
-                // تنظيف البيانات
-                let userType = (item.userType || "").trim();
-                let actionType = (item.actionType || "").trim();
-                let points = parseFloat(item.points || 0);
-
-                // منطق احتساب النقاط: فرد + بيع فقط
-                let pointsForThisRow = 0;
-                if (userType === "فرد" && actionType === "بيع") {
-                    pointsForThisRow = points;
-                }
-               
-                totalPoints += pointsForThisRow;
-
-                // عرض البيانات كما هي مخزنة في الـ localStorage
                 row.innerHTML = `
                     <td>${item.type || '-'}</td>
-                    <td>${userType || '-'}</td>
-                    <td>${actionType || '-'}</td>
+                    <td>${item.userType || '-'}</td>
+                    <td>${item.actionType || '-'}</td>
                     <td>${item.weight || 0}</td>
-                    <td>${pointsForThisRow}</td>
+                    <td>${points}</td>
                     <td>${item.date || '-'}</td>
                 `;
+                totalPoints += parseFloat(points);
             });
-           
-            // عرض الإجمالي
+
             document.getElementById('user-points').innerText = totalPoints;
         }
 
