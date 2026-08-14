@@ -5,55 +5,64 @@
     <title>EcoTechDZ - تسجيل</title>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; }
-        form { background: #fff; padding: 20px; border-radius: 8px; max-width: 400px; margin: auto; }
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; margin: 0; }
+        .nav-bar { background: #287456; padding: 15px; color: white; text-align: center; border-radius: 5px; margin-bottom: 20px; }
+        .nav-bar a { color: white; margin: 0 5px; text-decoration: none; font-weight: bold; }
+        form { background: #fff; padding: 20px; border-radius: 8px; max-width: 400px; margin: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         input, button { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; }
-        button { background-color: #28a745; color: white; border: none; cursor: pointer; }
+        button { background-color: #28a745; color: white; border: none; cursor: pointer; font-weight: bold; border-radius: 4px; }
     </style>
 </head>
 <body>
 
-<form id="signupForm">
-    <h2> إنشاء حساب جديد </h2>
-    <input type="text" id="fullName" placeholder="الاسم الكامل" required>
-    <input type="email" id="email" placeholder="البريد الإلكتروني" required>
-    <input type="password" id="password" placeholder="كلمة المرور" required>
-    <button type="button" id="sendBtn" onclick="sendOTP()">إرسال كود التحقق</button>
-</form>
+    <div class="nav-bar">
+        <a href="signup.html">التسجيل</a>
+        <a href="verify.html">التحقق</a>
+        <a href="index.html">الرئيسية</a>
+        <a href="dashboard.html">لوحة التحكم</a>
+        <a href="municipal_dashboard.html">لوحة البلديات</a>
+        <a href="admin_dashboard.html">لوحة المدير</a>
+    </div>
 
-<script type="text/javascript">
-    emailjs.init("DrsQFDKtRE2nbijaO");
+    <form id="signupForm">
+        <h2>إنشاء حساب جديد</h2>
+        <input type="text" id="fullName" placeholder="الاسم الكامل" required>
+        <input type="email" id="email" placeholder="البريد الإلكتروني" required>
+        <input type="password" id="password" placeholder="كلمة المرور" required>
+        <button type="button" id="sendBtn" onclick="sendOTP()">إرسال كود التحقق</button>
+    </form>
 
-    function sendOTP() {
-        const userEmail = document.getElementById('email').value;
-        if (!userEmail) {
-            alert("يرجى إدخال البريد الإلكتروني");
-            return;
+    <script type="text/javascript">
+        emailjs.init("DrsQFDKtRE2nbijaO");
+
+        function sendOTP() {
+            const userEmail = document.getElementById('email').value;
+            if (!userEmail) {
+                alert("يرجى إدخال البريد الإلكتروني");
+                return;
+            }
+
+            const generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+            localStorage.setItem("myGeneratedOTP", generatedOTP);
+            localStorage.setItem("userEmail", userEmail); // حفظ الإيميل المؤقت للتحقق لاحقاً
+
+            document.getElementById('sendBtn').innerText = "جاري الإرسال...";
+
+            emailjs.send("service_me5o2lp", "template_f2zzbb6", {
+                email: userEmail,
+                passcode: generatedOTP
+            }).then(function() {
+                let users = JSON.parse(localStorage.getItem('registeredUsers') || "[]");
+                users.push(userEmail);
+                localStorage.setItem('registeredUsers', JSON.stringify(users));
+
+                alert("تم إرسال الكود! سيتم تحويلك لصفحة التحقق.");
+                window.location.href = "verify.html";
+            }, function(err) {
+                alert("فشل الإرسال: " + JSON.stringify(err));
+                document.getElementById('sendBtn').innerText = "إرسال كود التحقق";
+            });
         }
-
-        const generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
-        localStorage.setItem("myGeneratedOTP", generatedOTP);
-        
-        document.getElementById('sendBtn').innerText = "جاري الإرسال...";
-
-        emailjs.send("service_me5o2lp", "template_f2zzbb6", {
-            email: userEmail,
-            passcode: generatedOTP
-        }).then(() => {
-            // كود الحفظ المحدث ليضيف الإيميل للقائمة
-            let users = JSON.parse(localStorage.getItem('registeredUsers') || "[]");
-            users.push(userEmail);
-            localStorage.setItem('registeredUsers', JSON.stringify(users));
-            
-            alert("تم إرسال الكود! سيتم تحويلك لصفحة التحقق.");
-            window.location.href = "verify.html";
-        }, (err) => {
-            alert("فشل الإرسال: " + JSON.stringify(err));
-            document.getElementById('sendBtn').innerText = "إرسال كود التحقق";
-        });
-    }
-</script>
-
+    </script>
 </body>
-</html>
-
+</html> 

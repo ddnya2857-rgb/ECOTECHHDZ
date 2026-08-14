@@ -2,24 +2,31 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>التحقق - EcoTechDZ</title>
+    <title>EcoTechDZ - التحقق</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; }
-        .container { background: #fff; padding: 20px; border-radius: 8px; max-width: 400px; margin: auto; }
-        input, button { width: 100%; padding: 10px; margin: 10px 0; }
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; margin: 0; }
+        .nav-bar { background: #287456; padding: 15px; color: white; text-align: center; border-radius: 5px; margin-bottom: 20px; }
+        .nav-bar a { color: white; margin: 0 5px; text-decoration: none; font-weight: bold; }
+        .container { background: #fff; padding: 20px; border-radius: 8px; max-width: 400px; margin: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        input, button { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; }
+        button { background-color: #28a745; color: white; border: none; cursor: pointer; font-weight: bold; border-radius: 4px; }
     </style>
 </head>
 <body>
-    <!-- شريط التنقل الموحد -->
-    <nav style="background: #287456; padding: 15px; color: white; text-align: center; margin-bottom: 20px;">
-        <a href="signup.html" style="color: white; margin: 0 10px; text-decoration: none;">التسجيل</a>
-        <a href="verify.html" style="color: white; margin: 0 10px; text-decoration: none;">التحقق</a>
-        <a href="index.html" style="color: white; margin: 0 10px; text-decoration: none;">الرئيسية</a>
-        <a href="dashboard.html" style="color: white; margin: 0 10px; text-decoration: none;">لوحة التحكم</a>
-        <a id="admin-link" href="admin_dashboard.html" style="color: #ffcccc; margin: 0 10px; text-decoration: none; font-weight: bold; display: none;">قائمة المستخدمين</a>
-    </nav>
+
+    <div class="nav-bar">
+        <a href="signup.html">التسجيل</a>
+        <a href="verify.html">التحقق</a>
+        <a href="index.html">الرئيسية</a>
+        <a href="dashboard.html">لوحة التحكم</a>
+        <a href="municipal_dashboard.html">لوحة البلديات</a>
+        <a id="admin-link" href="admin_dashboard.html" style="color: #ffcccc; display: none; font-weight: bold;">لوحة المدير</a>
+    </div>
+
     <script>
-        if(localStorage.getItem("userEmail") === "ddnya2857@gmail.com") { document.getElementById("admin-link").style.display = "inline"; }
+        if(localStorage.getItem("loggedInUserEmail") === "ddnya2857@gmail.com") {
+            document.getElementById("admin-link").style.display = "inline";
+        }
     </script>
 
     <div class="container">
@@ -30,31 +37,29 @@
 
     <script>
         async function verifyCode() {
-    const enteredOTP = document.getElementById('otpInput').value;
-    const savedOTP = localStorage.getItem("myGeneratedOTP");
-    const userEmail = localStorage.getItem("userEmail");
-   
-    if(enteredOTP === savedOTP) {
-        alert("تم التحقق بنجاح!");
-        localStorage.setItem("loggedInUserEmail", userEmail);
+            const enteredOTP = document.getElementById('otpInput').value;
+            const savedOTP = localStorage.getItem("myGeneratedOTP");
+            const userEmail = localStorage.getItem("userEmail");
 
-        // إرسال المستخدم الجديد إلى خادم Node.js لتخزينه في قاعدة بيانات MongoDB Atlas
-        try {
-            await fetch('/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: userEmail.split('@')[0], email: userEmail })
-            });
-        } catch (e) {
-            console.log("خطأ في الحفظ السحابي للمستخدم");
+            if(enteredOTP === savedOTP) {
+                alert("تم التحقق بنجاح!");
+                localStorage.setItem("loggedInUserEmail", userEmail);
+
+                try {
+                    await fetch('/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: userEmail.split('@')[0], email: userEmail })
+                    });
+                } catch (e) {
+                    console.log("خطأ في الحفظ السحابي للمستخدم");
+                }
+
+                window.location.href = "index.html";
+            } else {
+                alert("الكود غير صحيح");
+            }
         }
-
-        window.location.href = "index.html";
-    } else {
-        alert("الكود غير صحيح");
-    }
-} 
-
     </script>
 </body>
 </html> 
