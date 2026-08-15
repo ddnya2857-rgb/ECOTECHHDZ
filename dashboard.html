@@ -2,22 +2,25 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>EcoTechDZ - لوحة التحكم</title>
+    <title>لوحة التحكم - EcoTechDZ</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f4f4; padding: 20px; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f4f4; padding: 20px; margin: 0; }
         .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-top: 20px; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: center; }
         th { background-color: #f8f9fa; color: #287456; }
+        .nav-bar { background: #287456; padding: 15px; color: white; text-align: center; border-radius: 10px; }
+        .nav-bar a { color: white; margin: 0 10px; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
-    <nav style="background: #287456; padding: 15px; color: white; text-align: center; border-radius: 10px;">
-        <a href="index.html" style="color: white; margin: 0 10px; text-decoration: none;">الرئيسية</a>
-        <a href="dashboard.html" style="color: white; margin: 0 10px; text-decoration: none;">لوحة التحكم</a>
-        <a href="municipal_dashboard.html" style="color: white; margin: 0 10px; text-decoration: none;">لوحة البلديات</a>
-        <a href="admin_dashboard.html" style="color: white; margin: 0 10px; text-decoration: none;">لوحة المدير</a>
-    </nav>
+
+    <div class="nav-bar">
+        <a href="index.html">الرئيسية</a>
+        <a href="dashboard.html">لوحة التحكم</a>
+        <a href="municipal_dashboard.html">لوحة البلديات</a>
+        <a href="admin_dashboard.html">لوحة المدير</a>
+    </div>
 
     <div class="card">
         <h3>رصيدك البيئي التراكمي</h3>
@@ -38,37 +41,33 @@
                     <th>التاريخ</th>
                 </tr>
             </thead>
-            <tbody id="historyBody"></tbody>
+            <tbody id="historyBody">
+                <!-- سيتم تعبئة البيانات تلقائياً هنا -->
+            </tbody>
         </table>
     </div>
 
     <script>
         function loadOperations() {
-            const currentUserEmail = localStorage.getItem("loggedInUserEmail");
             const tbody = document.getElementById('historyBody');
             let totalPoints = 0;
-
-            const allHistory = JSON.parse(localStorage.getItem('allOperations')) || [];
            
-            if (allHistory.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6">لا توجد عمليات مسجلة لك حتى الآن</td></tr>`;
-                document.getElementById('user-points').innerText = "0";
-                return;
-            }
-
-            // تصفية العمليات الخاصة بالمستخدم الحالي أو عرض الكل حسب الحاجة
-            const userHistory = currentUserEmail ? allHistory.filter(item => item.email === currentUserEmail) : allHistory;
+            // جلب العمليات من التخزين المشترك
+            const allHistory = JSON.parse(localStorage.getItem('allOperations') || '[]');
            
             tbody.innerHTML = "";
-            if (userHistory.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6">لا توجد عمليات مسجلة لك حتى الآن</td></tr>`;
+           
+            if (allHistory.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='6'>لا توجد عمليات مسجلة حتى الآن</td></tr>";
                 document.getElementById('user-points').innerText = "0";
                 return;
             }
-
-            userHistory.forEach(item => {
+           
+            allHistory.forEach(item => {
                 let row = tbody.insertRow();
-                let points = (item.userType === 'فرد' && item.actionType === 'بيع') ? (item.points || 0) : 0;
+               
+                // احتساب النقاط للأفراد عند عملية البيع
+                let points = (item.actionType === 'بيع' && item.userType === 'فرد') ? (parseFloat(item.weight) * 10 || 10) : (item.points || 0);
                
                 row.innerHTML = `
                     <td>${item.type || '-'}</td>
@@ -78,9 +77,10 @@
                     <td>${points}</td>
                     <td>${item.date || '-'}</td>
                 `;
+               
                 totalPoints += parseFloat(points);
             });
-
+           
             document.getElementById('user-points').innerText = totalPoints;
         }
 

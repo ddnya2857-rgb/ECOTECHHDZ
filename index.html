@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>الرئيسية - EcoTechDZ</title>
+    <title>EcoTechDZ - الرئيسية</title>
     <!-- إضافة مكتبات الذكاء الاصطناعي -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
@@ -18,13 +18,14 @@
     </style>
 </head>
 <body>
+
     <div class="nav-bar">
         <a href="index.html">الرئيسية</a>
         <a href="dashboard.html">لوحة التحكم</a>
         <a href="municipal_dashboard.html">لوحة البلديات</a>
         <a href="admin_dashboard.html">لوحة المدير</a>
     </div>
-   
+
     <div style="text-align: center;">
         <div class="logo-container">
             <img src="logo.jpeg" alt="EcoTechDZ Logo">
@@ -52,7 +53,18 @@
             </label>
             <div id="contractDetails" style="display:none; margin-top: 8px;">
                 <input type="number" id="contractMaxWeight" placeholder="أدخل الكمية الإجمالية المتفق عليها (كغ)" oninput="checkContractLimit()">
-                <small style="color: #666; display: block;">ملاحظة: ستتوقف هذه النفايات تلقائياً عند استنفاز الكمية المحددة.</small>
+                <small style="color: #666; display: block;">ملاحظة: ستتوقف هذه النفايات تلقائيًا عند استنفاز الكمية المحددة.</small>
+            </div>
+        </div>
+
+        <!-- قسم صفقة التصريف -->
+        <div style="background: #f8d7da; padding: 10px; border-radius: 5px; margin-bottom: 10px; border: 1px solid #f5c6cb;">
+            <label style="font-weight: bold; font-size: 13px; color: #721c24;">
+                <input type="checkbox" id="contractDisposalToggle" onchange="toggleDisposalDetails()" style="width: auto; margin-left: 5px;">
+                تفعيل صفقة تصريف متفق عليها للنفايات
+            </label>
+            <div id="disposalDetails" style="display:none; margin-top: 8px;">
+                <input type="number" id="disposalMaxWeight" placeholder="أدخل الكمية المراد تصريفها (كغ)">
             </div>
         </div>
 
@@ -62,8 +74,8 @@
             <option value="معادن">معادن</option>
             <option value="ورق">ورق</option>
             <option value="زجاج">زجاج</option>
-            <option id="mainOptAnimal" value="نفايات حيوانية" style="display:none">نفايات حيوانية (للكولاجين)</option>
-            <option id="mainOptPlant" value="نفايات نباتية" style="display:none">نفايات نباتية (أسمدة وزيوت)</option>
+            <option id="mainOptAnimal" value="نفايات حيوانية" style="display:none;">نفايات حيوانية (للجولاجين)</option>
+            <option id="mainOptPlant" value="نفايات نباتية" style="display:none;">نفايات نباتية (أسمدة وزيوت)</option>
         </select>
 
         <input type="number" id="weight" placeholder="الوزن (كغ)" oninput="updatePrice()">
@@ -85,12 +97,11 @@
             <input type="password" id="cardCode" placeholder="كود التحقق السري">
         </div>
 
-        <!-- قائمة أنواع المستخدمين المحدثة -->
         <select id="userType">
             <option value="فرد">فرد</option>
             <option value="مؤسسة">مؤسسة عمومية أو خاصة</option>
-            <option value="فندق">فندق</option>
-            <option value="مطعم">مطعم</option>
+            <option value="ورشة صناعية">ورشة صناعية</option>
+            <option value="مستثمر">مستثمر</option>
             <option value="ناقل نفايات">ناقل نفايات (صاحب شاحنة نقل)</option>
             <option value="مركز معالجة">مركز معالجة وإعادة تدوير</option>
             <option value="بلدية">بلدية</option>
@@ -98,14 +109,13 @@
 
         <input type="text" id="location" placeholder="حدد موقع الحي أو المنزل عبر الـ GPS" readonly>
         <button onclick="getLocation()" style="background:#6c757d">تحديد الموقع (GPS)</button>
-       
+
         <button onclick="submitTransaction()" style="background:#dc3545; margin-top:10px;">تأكيد العملية</button>
     </div>
 
     <script>
         let aiModel;
-       
-        // تحميل نموذج الذكاء الاصطناعي للرؤية
+
         mobilenet.load().then(loadedModel => {
             aiModel = loadedModel;
             document.getElementById('aiStatus').innerText = "الذكاء الاصطناعي جاهز للتعرف على النفايات!";
@@ -142,12 +152,17 @@
             }
         }
 
+        function toggleDisposalDetails() {
+            const isChecked = document.getElementById('contractDisposalToggle').checked;
+            const details = document.getElementById('disposalDetails');
+            details.style.display = isChecked ? 'block' : 'none';
+        }
+
         function checkContractLimit() {
             const maxW = parseFloat(document.getElementById('contractMaxWeight').value) || 0;
             let allOps = JSON.parse(localStorage.getItem('allOperations') || '[]');
-            let deliveredWeight = allOps
-                .filter(op => op.type === 'نفايات حيوانية' || op.type === 'نفايات نباتية')
-                .reduce((sum, op) => sum + (parseFloat(op.weight) || 0), 0);
+            let deliveredWeight = allOps.filter(op => op.type === 'نفايات حيوانية' || op.type === 'نفايات نباتية')
+                                        .reduce((sum, op) => sum + (parseFloat(op.weight) || 0), 0);
            
             if (maxW > 0 && deliveredWeight >= maxW) {
                 alert("لقد بلغت الكمية الإجمالية المتفق عليها لصفقة التوريد! سيتم إيقاف ظهور هذه النفايات.");
@@ -200,7 +215,7 @@
                 const predictions = await aiModel.classify(video);
                 if (predictions && predictions.length > 0) {
                     const topPrediction = predictions[0].className.toLowerCase();
-                    let selectedType = "بلاستيك"; // افتراضي
+                    let selectedType = "بلاستيك";
                    
                     if (topPrediction.includes('bottle') || topPrediction.includes('plastic') || topPrediction.includes('container')) {
                         selectedType = "بلاستيك";
@@ -228,17 +243,51 @@
                 navigator.geolocation.getCurrentPosition(position => {
                     const lat = position.coords.latitude.toFixed(4);
                     const lon = position.coords.longitude.toFixed(4);
-                    document.getElementById('location').value = "خط العرض: " + lat + ", خط الطول: " + lon;
+                    document.getElementById('location').value = `خط عرض: ${lat}, خط طول: ${lon}`;
                 }, () => {
                     alert("تعذر تحديد الموقع الجغرافي.");
                 });
             } else {
-                alert("خاصية تحديد الموقع غير مدعومة في متصفحك.");
+                alert("المتصفح لا يدعم تحديد الموقع.");
             }
         }
 
         function submitTransaction() {
-            alert("تم تأكيد العملية بنجاح!");
+            const wasteType = document.getElementById('wasteType').value;
+            const weight = document.getElementById('weight').value;
+            const userType = document.getElementById('userType').value;
+            const actionType = document.getElementById('actionType').value;
+            const price = document.getElementById('price').value;
+            const location = document.getElementById('location').value;
+
+            if (!wasteType || !weight) {
+                alert("يرجى اختيار نوع النفايات وإدخال الوزن!");
+                return;
+            }
+
+            const transaction = {
+                user: userType,          /* تم ضبطها لتعرض اسم المستخدم/نوعه بشكل صحيح في الجداول */
+                userType: userType,
+                type: wasteType,
+                weight: weight,
+                actionType: actionType,
+                price: price,
+                location: location || 'غير محدد',
+                date: new Date().toLocaleDateString()
+            };
+
+            // الحفظ تحت مفتاح allOperations (الخاص بلوحة المدير والبلديات)
+            let allOps = JSON.parse(localStorage.getItem('allOperations') || '[]');
+            allOps.push(transaction);
+            localStorage.setItem('allOperations', JSON.stringify(allOps));
+
+            // الحفظ تحت مفتاح transactions (الخاص بلوحة التحكم)
+            let userOps = JSON.parse(localStorage.getItem('transactions') || '[]');
+            userOps.push(transaction);
+            localStorage.setItem('transactions', JSON.stringify(userOps));
+
+            alert("تم تأكيد العملية بنجاح وتسجيلها في النظام!");
+            window.location.href = 'dashboard.html';
         }
     </script>
 </body>
