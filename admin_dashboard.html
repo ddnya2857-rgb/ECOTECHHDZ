@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>لوحة تحكم المدير - EcoTechDZ</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; padding: 20px; color: #333; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; padding: 20px; color: #333; margin: 0; }
         .nav-bar { background: #287456; padding: 15px; color: white; text-align: center; border-radius: 8px; margin-bottom: 20px; }
         .nav-bar a { color: white; margin: 0 10px; text-decoration: none; font-weight: bold; }
         .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 25px; }
@@ -37,7 +37,6 @@
             </thead>
             <tbody id="contractsTable"></tbody>
         </table>
-        <p style="font-size: 12px; color: #777; margin-top: 10px;">يشمل عقود توريد المواد الخام وعقود تصريف نفايات المؤسسات.</p>
     </div>
 
     <!-- سجل العمليات العام -->
@@ -46,9 +45,9 @@
         <table>
             <thead>
                 <tr>
-                    <th>المستخدم</th>
-                    <th>نوع المستخدم</th>
-                    <th>النوع</th>
+                    <th>إيميل المستخدم</th>
+                    <th>نوع المستخدم المحدد</th>
+                    <th>نوع النفايات</th>
                     <th>الوزن</th>
                     <th>نوع العملية</th>
                     <th>الموقع (GPS)</th>
@@ -63,20 +62,23 @@
         const tbody = document.getElementById('adminTableBody');
         const contractsTable = document.getElementById('contractsTable');
        
-        // جلب سجل العمليات العام
+        // جلب سجل العمليات العام وعرض الإيميل ونوع المستخدم المحدد بدقة
         tbody.innerHTML = "";
         if (history.length === 0) {
             tbody.innerHTML = "<tr><td colspan='6'>لا توجد عمليات مسجلة حالياً.</td></tr>";
         } else {
             history.forEach(item => {
                 let row = tbody.insertRow();
+                // التأكد من جلب البريد المخزن في العملية أو استخدام البريد المسجل حالياً كبديل
+                let userEmail = item.email || localStorage.getItem("loggedInUserEmail") || "user@ecotech.dz";
+               
                 row.innerHTML = `
-                    <td>${item.user || 'مستخدم'}</td>
-                    <td>${item.userType || '-'}</td>
-                    <td style="font-weight:bold;">${item.type}</td>
-                    <td>${item.weight} كغ</td>
-                    <td>${item.actionType || item.action || '-'}</td>
-                    <td style="font-size: 11px;">${item.location || 'غير مححدد'}</td>
+                    <td style="color: #007bff; font-weight: 500;">${userEmail}</td>
+                    <td><span style="background: #e2f0d9; padding: 4px 8px; border-radius: 4px; color: #287456; font-weight: bold;">${item.userType || '-'}</span></td>
+                    <td style="font-weight:bold;">${item.type || '-'}</td>
+                    <td>${item.weight || 0} كغ</td>
+                    <td>${item.actionType || '-'}</td>
+                    <td style="font-size: 11px;">${item.location || 'غير محدد'}</td>
                 `;
             });
         }
