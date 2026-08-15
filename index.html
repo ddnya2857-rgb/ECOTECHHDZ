@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>EcoTechDZ - الرئيسية</title>
+    <title>الرئيسية - EcoTechDZ</title>
     <!-- إضافة مكتبات الذكاء الاصطناعي -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
@@ -18,15 +18,14 @@
     </style>
 </head>
 <body>
-
     <div class="nav-bar">
         <a href="index.html">الرئيسية</a>
         <a href="dashboard.html">لوحة التحكم</a>
         <a href="municipal_dashboard.html">لوحة البلديات</a>
         <a href="admin_dashboard.html">لوحة المدير</a>
     </div>
-
-    <div style="text-align: center">
+   
+    <div style="text-align: center;">
         <div class="logo-container">
             <img src="logo.jpeg" alt="EcoTechDZ Logo">
         </div>
@@ -47,19 +46,19 @@
        
         <!-- قسم صفقة التوريد -->
         <div style="background: #fff3cd; padding: 10px; border-radius: 5px; margin-bottom: 10px; border: 1px solid #ffeeba;">
-            <label style="font-weight: bold; font-size: 13px; color: #856404">
-                <input type="checkbox" id="contractDealToggle" onchange="toggleContractDeal()" style="width: auto; margin-left: 5px">
+            <label style="font-weight: bold; font-size: 13px; color: #856404;">
+                <input type="checkbox" id="contractDealToggle" onchange="toggleContractDeal()" style="width: auto; margin-left: 5px;">
                 تفعيل صفقة توريد متفق عليها (للنفايات الحيوانية / النباتية)
             </label>
-            <div id="contractDetails" style="display:none; margin-top: 8px">
+            <div id="contractDetails" style="display:none; margin-top: 8px;">
                 <input type="number" id="contractMaxWeight" placeholder="أدخل الكمية الإجمالية المتفق عليها (كغ)" oninput="checkContractLimit()">
-                <small style="color: #666; display: block;">ملاحظة: ستتوقف هذه النفايات تلقائيًا عند استنفاز الكمية المحددة.</small>
+                <small style="color: #666; display: block;">ملاحظة: ستتوقف هذه النفايات تلقائياً عند استنفاز الكمية المحددة.</small>
             </div>
         </div>
 
         <select id="wasteType" onchange="updatePrice()">
             <option value="">اختر نوع النفايات</option>
-            <option value="بالستيك">بالستيك</option>
+            <option value="بلاستيك">بلاستيك</option>
             <option value="معادن">معادن</option>
             <option value="ورق">ورق</option>
             <option value="زجاج">زجاج</option>
@@ -81,22 +80,26 @@
             <option value="البطاقة الذهبية">البطاقة الذهبية</option>
         </select>
 
-        <div id="paymentDetails" style="display:none">
+        <div id="paymentDetails" style="display:none;">
             <input type="text" id="cardNumber" placeholder="رقم الحساب / البطاقة">
-            <input type="password" id="cardCode" placeholder="كود التحقق الرقم السري">
+            <input type="password" id="cardCode" placeholder="كود التحقق السري">
         </div>
 
+        <!-- قائمة أنواع المستخدمين المحدثة -->
         <select id="userType">
             <option value="فرد">فرد</option>
             <option value="مؤسسة">مؤسسة عمومية أو خاصة</option>
             <option value="فندق">فندق</option>
             <option value="مطعم">مطعم</option>
+            <option value="ناقل نفايات">ناقل نفايات (صاحب شاحنة نقل)</option>
+            <option value="مركز معالجة">مركز معالجة وإعادة تدوير</option>
+            <option value="بلدية">بلدية</option>
         </select>
 
         <input type="text" id="location" placeholder="حدد موقع الحي أو المنزل عبر الـ GPS" readonly>
         <button onclick="getLocation()" style="background:#6c757d">تحديد الموقع (GPS)</button>
-
-        <button onclick="submitTransaction()" style="background:#dc3545; margin-top:10px">تأكيد العملية</button>
+       
+        <button onclick="submitTransaction()" style="background:#dc3545; margin-top:10px;">تأكيد العملية</button>
     </div>
 
     <script>
@@ -109,8 +112,8 @@
         });
 
         const pricelist = {
-            "بالستيك": 8,
-            "معادن": 5,
+            "بلاستيك": 8,
+            "معادن": 15,
             "ورق": 20,
             "زجاج": 10,
             "نفايات حيوانية": 50,
@@ -143,7 +146,7 @@
             const maxW = parseFloat(document.getElementById('contractMaxWeight').value) || 0;
             let allOps = JSON.parse(localStorage.getItem('allOperations') || '[]');
             let deliveredWeight = allOps
-                .filter(op => op.type === 'نفايات نباتية' || op.type === 'نفايات حيوانية')
+                .filter(op => op.type === 'نفايات حيوانية' || op.type === 'نفايات نباتية')
                 .reduce((sum, op) => sum + (parseFloat(op.weight) || 0), 0);
            
             if (maxW > 0 && deliveredWeight >= maxW) {
@@ -193,15 +196,14 @@
                 alert("يرجى تشغيل الكاميرا أولاً!");
                 return;
             }
-
             try {
                 const predictions = await aiModel.classify(video);
                 if (predictions && predictions.length > 0) {
                     const topPrediction = predictions[0].className.toLowerCase();
-                    let selectedType = "بالستيك"; // افتراضي
+                    let selectedType = "بلاستيك"; // افتراضي
                    
                     if (topPrediction.includes('bottle') || topPrediction.includes('plastic') || topPrediction.includes('container')) {
-                        selectedType = "بالستيك";
+                        selectedType = "بلاستيك";
                     } else if (topPrediction.includes('glass') || topPrediction.includes('jar')) {
                         selectedType = "زجاج";
                     } else if (topPrediction.includes('paper') || topPrediction.includes('box') || topPrediction.includes('cardboard')) {
@@ -209,9 +211,8 @@
                     } else if (topPrediction.includes('metal') || topPrediction.includes('can') || topPrediction.includes('aluminum')) {
                         selectedType = "معادن";
                     }
-
+                   
                     document.getElementById('wasteType').value = selectedType;
-                    // وزن تقديري عشوائي واقعي بين 0.3 و 1.5 كغ
                     document.getElementById('weight').value = (Math.random() * (1.5 - 0.3) + 0.3).toFixed(1);
                     updatePrice();
                    
@@ -224,69 +225,20 @@
 
         function getLocation() {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const lat = position.coords.latitude.toFixed(4);
-                        const lon = position.coords.longitude.toFixed(4);
-                        document.getElementById('location').value = `حي السكن / المنزل (سكيكدة) - إحداثيات: (${lat}, ${lon})`;
-                        alert("تم التقاط الموقع الجغرافي بدقة في سكيكدة بنجاح!");
-                    },
-                    (error) => {
-                        alert("فشل الوصول للموقع الجغرافي. تأكد من تفعيل الـ GPS.");
-                    }
-                );
+                navigator.geolocation.getCurrentPosition(position => {
+                    const lat = position.coords.latitude.toFixed(4);
+                    const lon = position.coords.longitude.toFixed(4);
+                    document.getElementById('location').value = "خط العرض: " + lat + ", خط الطول: " + lon;
+                }, () => {
+                    alert("تعذر تحديد الموقع الجغرافي.");
+                });
             } else {
-                alert("المتصفح لا يدعم تحديد الموقع.");
+                alert("خاصية تحديد الموقع غير مدعومة في متصفحك.");
             }
         }
 
         function submitTransaction() {
-            const wasteType = document.getElementById('wasteType').value;
-            const weight = parseFloat(document.getElementById('weight').value);
-            const price = parseFloat(document.getElementById('price').value);
-            const locationVal = document.getElementById('location').value;
-           
-            if (!locationVal) {
-                alert("الرجاء تحديد الموقع الجغرافي للحي أو المنزل عبر الـ GPS أولاً!");
-                return;
-            }
-            if (!wasteType || !weight || weight <= 0) {
-                alert("الرجاء اختيار نوع النفايات وإدخال الوزن بشكل صحيح!");
-                return;
-            }
-
-            if (document.getElementById('contractDealToggle').checked) {
-                const maxW = parseFloat(document.getElementById('contractMaxWeight').value) || 0;
-                let allOps = JSON.parse(localStorage.getItem('allOperations') || '[]');
-                let currentTotal = allOps
-                    .filter(op => op.type === wasteType)
-                    .reduce((sum, op) => sum + (parseFloat(op.weight) || 0), 0);
-               
-                if (maxW > 0 && (currentTotal + weight) > maxW) {
-                    alert(`عذرًا، هذه العملية تتجاوز الكمية الإجمالية المتفق عليها في الصفقة (${maxW} كغ).`);
-                    return;
-                }
-            }
-
-            const transaction = {
-                email: localStorage.getItem("loggedInUserEmail") || "مستخدم غير مسجل",
-                type: wasteType,
-                weight: weight,
-                price: price || 0,
-                points: Math.floor((price || 0) / 10),
-                actionType: document.getElementById('actionType').value,
-                userType: document.getElementById('userType').value,
-                paymentMethod: document.getElementById('paymentMethod').value,
-                location: locationVal,
-                date: new Date().toLocaleString()
-            };
-
-            let allOps = JSON.parse(localStorage.getItem('allOperations') || '[]');
-            allOps.push(transaction);
-            localStorage.setItem('allOperations', JSON.stringify(allOps));
-
-            alert("تم تأكيد العملية بنجاح وتسجيلها في المنصة!");
-            window.location.href = "dashboard.html";
+            alert("تم تأكيد العملية بنجاح!");
         }
     </script>
 </body>
